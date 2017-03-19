@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.suraj.dailyexpenses.MainActivity">
+
+    <TextView
+        android:id="@+id/tvDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/setDate" />
+
+    <Button
+        android:id="@+id/btnSetDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/tvDate"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:text="@string/setDate" />
+
+    <EditText
+        android:id="@+id/etSpendReason"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvDate"
+        android:layout_marginTop="20dp"
+        android:hint="@string/spentReasonHint" />
+
+    <HorizontalScrollView
+        android:id="@+id/hzScrollViewReasons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/etSpendReason"
+        android:layout_marginTop="20dp"
+        android:scrollbarSize="0dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnBreakfastText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/breakfast" />
+
+            <Button
+                android:id="@+id/btnTeaText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tea" />
+
+            <Button
+                android:id="@+id/btnSnacksText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/snacks" />
+
+            <Button
+                android:id="@+id/btnLunchText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lunch" />
+
+            <Button
+                android:id="@+id/btnDinnerText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/dinner" />
+
+            <Button
+                android:id="@+id/btnAlcoholText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/alcohol" />
+
+            <Button
+                android:id="@+id/btnMiscText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/misc" />
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
+
+    <EditText
+        android:id="@+id/etSpentAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/hzScrollViewReasons"
+        android:layout_marginTop="20dp"
+        android:hint="@string/spentReasonAmountHint"
+        android:inputType="number" />
+
+    <HorizontalScrollView
+        android:id="@+id/hzScrollViewAmounts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/etSpentAmount"
+        android:layout_marginTop="20dp"
+        android:scrollbarSize="0dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/string10" />
+
+            <Button
+                android:id="@+id/btn20"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/string20" />
+
+            <Button
+                android:id="@+id/btn30"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/string30" />
+
+            <Button
+                android:id="@+id/btn40"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/string40" />
+
+            <Button
+                android:id="@+id/btn50"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/string50" />
+
+            <Button
+                android:id="@+id/btn100"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/string100" />
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
+
+    <Button
+        android:id="@+id/btnView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/hzScrollViewAmounts"
+        android:layout_marginTop="10dp"
+        android:text="@string/view" />
+
+    <Button
+        android:id="@+id/btnSave"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btnView"
+        android:layout_marginTop="10dp"
+        android:text="@string/save" />
+
+    <TextView
+        android:id="@+id/tvTodaysExpenditure"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="@string/todaysExpenditure" />
+
+</RelativeLayout>

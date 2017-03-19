@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">Daily Expenses</string>
+    <string name="setDate">Set Date</string>
+
+    <string name="breakfast">Breakfast</string>
+    <string name="tea">Tea</string>
+    <string name="snacks">Snacks</string>
+    <string name="lunch">Lunch</string>
+    <string name="dinner">Dinner</string>
+    <string name="alcohol">Alcohol</string>
+    <string name="misc">Misc</string>
+
+    <string name="spentReasonHint">On what did you spend?</string>
+
+    <string name="string10">10</string>
+    <string name="string20">20</string>
+    <string name="string30">30</string>
+    <string name="string40">40</string>
+    <string name="string50">50</string>
+    <string name="string100">100</string>
+
+    <string name="spentReasonAmountHint">Amount</string>
+
+    <string name="view">View</string>
+    <string name="save">Save</string>
+
+    <string name="todaysExpenditure">Today\'s Expenditure: Rs. %1$s</string>
+    <string name="rs">Rs. %1$s</string>
+
+    <string name="expnditureDay">Total expenditure: Rs. %1$s</string>
+
+    <string name="validDataError">Enter valid data</string>
+</resources>
