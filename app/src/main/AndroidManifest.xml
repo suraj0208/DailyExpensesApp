@@ -15,7 +15,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ViewExpensesActivity"></activity>
+        <activity android:name=".ViewExpensesActivity" />
+        <activity android:name=".MonthExpensesActivity"></activity>
     </application>
 
 </manifest>

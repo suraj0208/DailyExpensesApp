@@ -8,4 +8,8 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="SelectableItemBackground">
+        <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
+
 </resources>

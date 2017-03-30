@@ -5,18 +5,25 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.HashSet;
 
 public class MainActivity extends AppCompatActivity {
     private int year;
     private int month;
     private int day;
+
+    private HashSet<String> commonReasons;
 
     private TextView tvDate;
     private TextView tvTodayExpenditure;
@@ -24,11 +31,12 @@ public class MainActivity extends AppCompatActivity {
     private EditText etSpendReason;
     private EditText etSpentAmount;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        commonReasons = new HashSet<>();
 
         tvDate = (TextView) findViewById(R.id.tvDate);
         tvTodayExpenditure = (TextView) findViewById(R.id.tvTodaysExpenditure);
@@ -39,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         initReasonViews();
         initAmountViews();
         initSaveButton();
-        initViewButton();
+        initViewButtons();
 
         (findViewById(R.id.btnSetDate)).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,11 +68,18 @@ public class MainActivity extends AppCompatActivity {
         showTodayExpenditure();
     }
 
-    private void initViewButton() {
-        (findViewById(R.id.btnView)).setOnClickListener(new View.OnClickListener() {
+    private void initViewButtons() {
+        (findViewById(R.id.btnViewDay)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(MainActivity.this, ViewExpensesActivity.class));
+            }
+        });
+
+        (findViewById(R.id.btnViewMonth)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, MonthExpensesActivity.class));
             }
         });
     }
@@ -85,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(etSpendReason.getText().length() == 0 || etSpentAmount.getText().length() ==0 ){
+                if (etSpendReason.getText().length() == 0 || etSpentAmount.getText().length() == 0) {
                     Utils.showToast(getResources().getString(R.string.validDataError));
                     return;
                 }
@@ -94,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
                 tvTodayExpenditure.setText(getResources().getString(R.string.todaysExpenditure, Utils.getExpenditure(tvDate.getText().toString())));
                 etSpentAmount.setText("");
                 etSpendReason.setText("");
+                MainActivity.this.closeIME(etSpendReason);
             }
         });
 
@@ -119,27 +135,93 @@ public class MainActivity extends AppCompatActivity {
         for (Button button : btnAmounts)
             button.setOnClickListener(amountsOnClickListener);
 
+
+        (findViewById(R.id.btnAmountPlus)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try{
+                    int amount = Integer.parseInt(etSpentAmount.getText().toString());
+                    amount++;
+                    etSpentAmount.setText(""+amount);
+
+                }catch (NumberFormatException ne){
+                    ne.printStackTrace();
+                }
+
+            }
+        });
+
+        (findViewById(R.id.btnAmountMinus)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try{
+                    int amount = Integer.parseInt(etSpentAmount.getText().toString());
+                    amount--;
+
+                    if(amount<0)
+                        amount=0;
+
+                    etSpentAmount.setText(""+amount);
+                }catch (NumberFormatException ne){
+                    ne.printStackTrace();
+                }
+            }
+        });
     }
 
     private void initReasonViews() {
+        final View hzScrollView = (findViewById(R.id.hzScrollViewReasons));
+
+        final String[] reasons = new String[]{
+                getResources().getString(R.string.breakfast),
+                getResources().getString(R.string.tea),
+                getResources().getString(R.string.snacks),
+                getResources().getString(R.string.lunch),
+                getResources().getString(R.string.dinner)
+        };
+
         Button[] btnReasons = new Button[]{(Button) findViewById(R.id.btnBreakfastText),
                 (Button) findViewById(R.id.btnTeaText),
                 (Button) findViewById(R.id.btnSnacksText),
                 (Button) findViewById(R.id.btnLunchText),
                 (Button) findViewById(R.id.btnDinnerText),
-                (Button) findViewById(R.id.btnAlcoholText),
-                (Button) findViewById(R.id.btnMiscText)};
+                };
 
-        View.OnClickListener reasonsOnClickListener = new View.OnClickListener() {
+        for (int i = 0; i < btnReasons.length; i++) {
+            final int index = i;
+            commonReasons.add(reasons[i]);
+            btnReasons[i].setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    etSpendReason.setText(reasons[index]);
+                }
+            });
+        }
+
+        etSpendReason.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onClick(View view) {
-                Button btn = (Button) view;
-                etSpendReason.setText(btn.getText());
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             }
-        };
 
-        for (Button button : btnReasons)
-            button.setOnClickListener(reasonsOnClickListener);
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(etSpendReason.getText().length()==0){
+                    hzScrollView.setVisibility(View.VISIBLE);
+                }else{
+                    hzScrollView.setVisibility(View.GONE);
+                }
+
+                if(commonReasons.contains(etSpendReason.getText().toString())){
+                    hzScrollView.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
     }
 
     private DatePickerDialog.OnDateSetListener myDateListener = new
@@ -168,6 +250,14 @@ public class MainActivity extends AppCompatActivity {
         }
         return null;
     }
+
+    public void closeIME(View view){
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(getApplicationContext().INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
 
 
 }

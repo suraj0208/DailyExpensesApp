@@ -18,19 +18,19 @@
 
     <Button
         android:id="@+id/btnSetDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@id/tvDate"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignBottom="@+id/tvDate"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:text="@string/setDate" />
+        android:background="@drawable/ic_calendar" />
 
     <EditText
         android:id="@+id/etSpendReason"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/tvDate"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:hint="@string/spentReasonHint" />
 
     <HorizontalScrollView
@@ -48,64 +48,53 @@
 
             <Button
                 android:id="@+id/btnBreakfastText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/breakfast" />
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/ic_breakfast" />
 
             <Button
                 android:id="@+id/btnTeaText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/tea" />
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/ic_tea" />
 
             <Button
                 android:id="@+id/btnSnacksText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/snacks" />
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/ic_snacks1" />
 
             <Button
                 android:id="@+id/btnLunchText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/lunch" />
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/ic_lunch" />
 
             <Button
                 android:id="@+id/btnDinnerText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/dinner" />
-
-            <Button
-                android:id="@+id/btnAlcoholText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/alcohol" />
-
-            <Button
-                android:id="@+id/btnMiscText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/misc" />
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/ic_dinner1" />
 
         </LinearLayout>
 
     </HorizontalScrollView>
 
-    <EditText
-        android:id="@+id/etSpentAmount"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/hzScrollViewReasons"
-        android:layout_marginTop="20dp"
-        android:hint="@string/spentReasonAmountHint"
-        android:inputType="number" />
-
     <HorizontalScrollView
         android:id="@+id/hzScrollViewAmounts"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/etSpentAmount"
+        android:layout_below="@id/hzScrollViewReasons"
         android:layout_marginTop="20dp"
         android:scrollbarSize="0dp">
 
@@ -118,57 +107,155 @@
                 android:id="@+id/btn10"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="#00000000"
                 android:text="@string/string10" />
 
             <Button
                 android:id="@+id/btn20"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="#00000000"
                 android:text="@string/string20" />
 
             <Button
                 android:id="@+id/btn30"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="#00000000"
                 android:text="@string/string30" />
 
             <Button
                 android:id="@+id/btn40"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="#00000000"
                 android:text="@string/string40" />
 
             <Button
                 android:id="@+id/btn50"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="#00000000"
                 android:text="@string/string50" />
 
             <Button
                 android:id="@+id/btn100"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="#00000000"
                 android:text="@string/string100" />
-
         </LinearLayout>
-
     </HorizontalScrollView>
 
-    <Button
-        android:id="@+id/btnView"
+    <LinearLayout
+        android:id="@+id/llAmounts"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/hzScrollViewAmounts"
-        android:layout_marginTop="10dp"
-        android:text="@string/view" />
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/btnSave"
+        <EditText
+            android:id="@+id/etSpentAmount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginRight="20dp"
+            android:layout_marginEnd="20dp"
+            android:hint="@string/spentReasonAmountHint"
+            android:inputType="number" />
+
+        <RelativeLayout
+            android:id="@+id/llPlusMinusButtons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/btnAmountPlus"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/ic_plus" />
+
+            <Button
+                android:id="@+id/btnAmountMinus"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_toEndOf="@+id/btnAmountPlus"
+                android:layout_toRightOf="@id/btnAmountPlus"
+                android:background="@drawable/ic_minus" />
+
+            <Button
+                android:id="@+id/btnSave"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_toEndOf="@+id/btnAmountMinus"
+                android:layout_toRightOf="@id/btnAmountMinus"
+                android:background="@drawable/ic_save" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+
+
+
+    <LinearLayout
+        android:id="@+id/llExpensesButtons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/btnView"
-        android:layout_marginTop="10dp"
-        android:text="@string/save" />
+        android:layout_below="@id/llAmounts"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <Button
+                android:id="@+id/btnViewMonth"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/ic_view_month" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/btnViewMonth"
+                android:layout_centerHorizontal="true"
+                android:text="@string/viewMonth" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <Button
+                android:id="@+id/btnViewDay"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/ic_view_today" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/btnViewDay"
+                android:layout_centerHorizontal="true"
+                android:text="@string/view" />
+        </RelativeLayout>
+
+
+    </LinearLayout>
+
 
     <TextView
         android:id="@+id/tvTodaysExpenditure"

@@ -5,31 +5,33 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.TextView;
 
+import com.suraj.dailyexpenses.data.Day;
 import com.suraj.dailyexpenses.data.Item;
 
 import java.util.List;
 
 /**
- * Created by suraj on 18/3/17.
+ * Created by suraj on 29/3/17.
  */
-public class ItemsAdapter extends ArrayAdapter<Item> {
-    private List<Item> itemList;
+public class DaysAdapter  extends ArrayAdapter{
+    private List<Day> daysList;
     private Context context;
     private InflationManager inflationManager;
 
-    public ItemsAdapter(Context context, List<Item> items, InflationManager inflationManager) {
+
+    public DaysAdapter(Context context, List<Day> daysList, InflationManager inflationManager) {
         super(context, R.layout.item_row);
 
-        this.itemList = items;
+        this.daysList = daysList;
         this.context = context;
         this.inflationManager = inflationManager;
     }
 
     @Override
     public int getCount() {
-        return itemList.size();
+        return daysList.size();
+
     }
 
     @Override
@@ -44,8 +46,4 @@ public class ItemsAdapter extends ArrayAdapter<Item> {
         return rowView;
 
     }
-}
-
-interface InflationManager {
-    void onGetView(int position, View convertView, ViewGroup parent);
 }

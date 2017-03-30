@@ -8,7 +8,7 @@
     tools:context="com.suraj.dailyexpenses.ViewExpensesActivity">
 
     <Spinner
-        android:id="@+id/spinDates"
+        android:id="@+id/spinMonths"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingEnd="@dimen/activity_vertical_margin"
@@ -17,27 +17,19 @@
         android:paddingStart="@dimen/activity_vertical_margin" />
 
     <TextView
-        android:id="@+id/tvExpenditureForDate"
+        android:id="@+id/tvExpenditureForMonth"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/spinDates"
-        android:layout_margin="10dp"
-        android:text="@string/app_name" />
-
-    <TextView
-        android:id="@+id/tvExpenditureForCurrentMonth"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tvExpenditureForDate"
+        android:layout_below="@id/spinMonths"
         android:layout_margin="10dp"
         android:text="@string/app_name" />
 
     <ListView
-        android:id="@+id/lstViewItems"
+        android:id="@+id/lstViewDaysOfMonth"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tvExpenditureForCurrentMonth"
+        android:layout_below="@id/tvExpenditureForMonth"
         android:layout_marginTop="10dp">
-
     </ListView>
+
 </RelativeLayout>

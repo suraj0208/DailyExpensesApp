@@ -3,11 +3,10 @@
     <string name="setDate">Set Date</string>
 
     <string name="breakfast">Breakfast</string>
-    <string name="tea">Tea</string>
+    <string name="tea">Tea/Coffee</string>
     <string name="snacks">Snacks</string>
     <string name="lunch">Lunch</string>
     <string name="dinner">Dinner</string>
-    <string name="alcohol">Alcohol</string>
     <string name="misc">Misc</string>
 
     <string name="spentReasonHint">On what did you spend?</string>
@@ -21,13 +20,18 @@
 
     <string name="spentReasonAmountHint">Amount</string>
 
-    <string name="view">View</string>
+    <string name="view">Today\'s\n Details</string>
+    <string name="viewMonth">Monthly\n Details</string>
+
     <string name="save">Save</string>
 
     <string name="todaysExpenditure">Today\'s Expenditure: Rs. %1$s</string>
     <string name="rs">Rs. %1$s</string>
 
     <string name="expnditureDay">Total expenditure: Rs. %1$s</string>
+
+    <string name="expnditureMonth">Total expenditure of month: Rs. %1$s</string>
+
 
     <string name="validDataError">Enter valid data</string>
 </resources>
