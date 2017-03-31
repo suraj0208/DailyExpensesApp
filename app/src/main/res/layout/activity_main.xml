@@ -159,9 +159,9 @@
             android:id="@+id/etSpentAmount"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginRight="20dp"
             android:layout_marginEnd="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_weight="1"
             android:hint="@string/spentReasonAmountHint"
             android:inputType="number" />
 
@@ -201,14 +201,12 @@
     </LinearLayout>
 
 
-
-
     <LinearLayout
         android:id="@+id/llExpensesButtons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/llAmounts"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="30dp"
         android:orientation="horizontal"
         android:weightSum="2">
 
@@ -229,6 +227,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/btnViewMonth"
                 android:layout_centerHorizontal="true"
+                android:layout_marginTop="5dp"
                 android:text="@string/viewMonth" />
 
         </RelativeLayout>
@@ -250,6 +249,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/btnViewDay"
                 android:layout_centerHorizontal="true"
+                android:layout_marginTop="5dp"
                 android:text="@string/view" />
         </RelativeLayout>
 

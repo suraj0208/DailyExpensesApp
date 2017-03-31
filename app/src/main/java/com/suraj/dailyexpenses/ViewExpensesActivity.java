@@ -40,19 +40,26 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
 
         String date;
 
-        if(getIntent().getStringExtra("date")==null){
+        if (getIntent().getStringExtra("date") == null) {
             spinDates.setSelection(dates.size() - 1);
-            date=spinDates.getSelectedItem().toString();
-        }else{
-            date=getIntent().getStringExtra("date");
+            date = spinDates.getSelectedItem().toString();
+        } else {
+            date = getIntent().getStringExtra("date");
+            int i;
 
-            for(int i=0;i<dates.size();i++) {
-                if (dates.get(i).equals(date)){
+            for (i = 0; i < dates.size(); i++) {
+                if (dates.get(i).equals(date)) {
                     spinDates.setSelection(i);
                     break;
                 }
             }
 
+            if (i == dates.size()) {
+                dates.add(date);
+                spinDates.setAdapter(new ArrayAdapter<>(ViewExpensesActivity.this, android.R.layout.simple_spinner_dropdown_item, dates));
+                spinDates.setSelection(dates.size() - 1);
+                date = spinDates.getSelectedItem().toString();
+            }
         }
 
         items = Utils.getItemsForDate(date);
@@ -87,15 +94,16 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
         tvExpenditureForMonth.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent   = new Intent(ViewExpensesActivity.this,MonthExpensesActivity.class);;
-                intent.putExtra("monthNumber",spinDates.getSelectedItem().toString().split("/")[1]);
+                Intent intent = new Intent(ViewExpensesActivity.this, MonthExpensesActivity.class);
+                ;
+                intent.putExtra("monthNumber", spinDates.getSelectedItem().toString().split("/")[1]);
                 startActivity(intent);
             }
         });
 
     }
 
-    private void updateListView(){
+    private void updateListView() {
         String date = spinDates.getSelectedItem().toString();
         listView.setAdapter(new ItemsAdapter(getApplicationContext(), items, this));
         tvExpenditureForDate.setText(getResources().getString(R.string.expnditureDay, Utils.getExpenditure(date)));
@@ -105,10 +113,10 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
     @Override
     public void onGetView(int position, View rowView, ViewGroup parent) {
 
-        Item item    = items.get(position);
+        Item item = items.get(position);
 
-        ((TextView)rowView.findViewById(R.id.tvItemName)).setText(item.getReason());
-        ((TextView)rowView.findViewById(R.id.tvItemAmount)).setText(getResources().getString(R.string.rs,item.getAmount()));
+        ((TextView) rowView.findViewById(R.id.tvItemName)).setText(item.getReason());
+        ((TextView) rowView.findViewById(R.id.tvItemAmount)).setText(getResources().getString(R.string.rs, item.getAmount()));
 
     }
 }

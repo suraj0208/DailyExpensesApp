@@ -15,7 +15,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.HashSet;
 
 public class MainActivity extends AppCompatActivity {
@@ -72,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         (findViewById(R.id.btnViewDay)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, ViewExpensesActivity.class));
+                startActivity(new Intent(MainActivity.this, ViewExpensesActivity.class).putExtra("date",tvDate.getText().toString()));
             }
         });
 
