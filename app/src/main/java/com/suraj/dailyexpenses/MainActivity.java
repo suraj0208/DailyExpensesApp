@@ -84,11 +84,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showTodayExpenditure() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month, day);
-        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        //Calendar calendar = Calendar.getInstance();
+        //calendar.set(year, month, day);
+        //int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
 
-        showDate(dayOfWeek, year, month + 1, day);
+        //showDate(dayOfWeek, year, month + 1, day);
 
         tvTodayExpenditure.setText(getResources().getString(R.string.todaysExpenditure, Utils.getExpenditure(tvDate.getText().toString())));
     }
@@ -232,6 +232,7 @@ public class MainActivity extends AppCompatActivity {
                     calendar.set(year, month, day);
                     int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
                     showDate(dayOfWeek, year, month + 1, day);
+                    showTodayExpenditure();
                 }
             };
 

@@ -69,6 +69,18 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
                 startActivity(intent);
             }
         });
+
+        spinMonth.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                updateListView();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
     }
 
     @Override
@@ -81,7 +93,7 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
 
     private void updateListView(){
         monthNumber = Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString());
-
+	days = Utils.getDatesForMonth(monthNumber);
         Collections.sort(days,Utils.dateComparator);
 
         DaysAdapter daysAdapter = new DaysAdapter(getApplicationContext(),days,this);
