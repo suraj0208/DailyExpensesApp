@@ -34,17 +34,17 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
 
         listView = (ListView) findViewById(R.id.lstViewItems);
 
-        ArrayList<String> dates = Utils.getAvailableDates();
+        ArrayList<String> dates = Utils.getAllDatesInDatabase();
 
         spinDates.setAdapter(new ArrayAdapter<>(ViewExpensesActivity.this, android.R.layout.simple_spinner_dropdown_item, dates));
 
         String date;
 
-        if (getIntent().getStringExtra("date") == null) {
+        if (getIntent().getStringExtra(Utils.DATE_INTENT_STRING) == null) {
             spinDates.setSelection(dates.size() - 1);
             date = spinDates.getSelectedItem().toString();
         } else {
-            date = getIntent().getStringExtra("date");
+            date = getIntent().getStringExtra(Utils.DATE_INTENT_STRING);
             int i;
 
             for (i = 0; i < dates.size(); i++) {
@@ -96,7 +96,7 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
             public void onClick(View view) {
                 Intent intent = new Intent(ViewExpensesActivity.this, MonthExpensesActivity.class);
                 ;
-                intent.putExtra("monthNumber", spinDates.getSelectedItem().toString().split("/")[1]);
+                intent.putExtra(Utils.DATE_INTENT_STRING, spinDates.getSelectedItem().toString().split("/")[1]);
                 startActivity(intent);
             }
         });
@@ -106,7 +106,7 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
     private void updateListView() {
         String date = spinDates.getSelectedItem().toString();
         listView.setAdapter(new ItemsAdapter(getApplicationContext(), items, this));
-        tvExpenditureForDate.setText(getResources().getString(R.string.expnditureDay, Utils.getExpenditure(date)));
+        tvExpenditureForDate.setText(getResources().getString(R.string.expnditureDay, Utils.getExpenditureForDate(date)));
         tvExpenditureForMonth.setText(getResources().getString(R.string.expnditureMonth, Utils.getExpensesForMonth(date.split("/")[1])));
     }
 

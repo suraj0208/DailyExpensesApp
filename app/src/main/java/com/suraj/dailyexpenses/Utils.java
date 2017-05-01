@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeMap;
 
+import io.realm.Case;
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
@@ -21,6 +22,9 @@ import io.realm.RealmResults;
  * Created by suraj on 18/3/17.
  */
 public class Utils {
+    public static final String MONTH_NUMBER_INTENT_STRING = "monthNumber";
+    public static final String DATE_INTENT_STRING = "date";
+
     private static Realm realm;
     private static Context context;
 
@@ -31,7 +35,12 @@ public class Utils {
         realm = Realm.getDefaultInstance();
         Utils.context = context;
 
-        dateComparator = new Comparator<Object>() {
+        dateComparator = getDateComparator();
+
+    }
+
+    private static Comparator<Object> getDateComparator(){
+        return new Comparator<Object>() {
             @Override
             public int compare(Object s_o, Object t1_o) {
                 String s;
@@ -65,11 +74,9 @@ public class Utils {
                 }
             }
         };
-
     }
 
     public static boolean saveInDatabase(String date, String reason, int amount) {
-
         try {
             realm.beginTransaction();
 
@@ -109,7 +116,7 @@ public class Utils {
         return results;
     }
 
-    public static int getExpenditure(String date) {
+    public static int getExpenditureForDate(String date) {
         int sum = 0;
         ArrayList<Item> results = getItemsForDate(date);
 
@@ -119,7 +126,7 @@ public class Utils {
         return sum;
     }
 
-    public static ArrayList<String> getAvailableDates() {
+    public static ArrayList<String> getAllDatesInDatabase() {
         RealmResults<Item> realmResults = realm.where(Item.class).findAll();
 
         HashSet<String> datesHashSet = new HashSet<>();
@@ -136,7 +143,7 @@ public class Utils {
 
     }
 
-    public static String getDayOfWeekText(int i) {
+    public static String getDayOfWeekString(int i) {
         String days[] = new String[]{"PlaceHolder", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
         return days[i];
     }
@@ -155,7 +162,7 @@ public class Utils {
 
     }
 
-    public static ArrayList<String> getMonthList() {
+    public static ArrayList<String> getMonthsFromDatabase() {
         RealmQuery<Item> itemRealmQuery = realm.where(Item.class);
         RealmResults<Item> realmResults = itemRealmQuery.findAll();
 
@@ -166,7 +173,7 @@ public class Utils {
 
             String currentMonth = date.split("/")[1];
 
-            monthSet.add(getMonthString(currentMonth));
+            monthSet.add(getMonthStringFromNumber(Integer.parseInt(currentMonth)));
         }
 
         return new ArrayList<>(monthSet);
@@ -188,16 +195,12 @@ public class Utils {
         return sum;
     }
 
-    public static String getMonthString(String month) {
-        int monthI = Integer.parseInt(month);
-
+    public static String getMonthStringFromNumber(int month) {
         String[] months = {"PLACE_HOLDER", "Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"};
-
-        return months[monthI];
-
+        return months[month];
     }
 
-    public static String getMonthNumberFromString(String s) {
+    public static String getMonthNumberFromString(String monthName) {
         HashMap<String, String> stringStringHashMap = new HashMap<>();
 
         stringStringHashMap.put("Jan", "1");
@@ -213,10 +216,10 @@ public class Utils {
         stringStringHashMap.put("Nov", "11");
         stringStringHashMap.put("Dec", "12");
 
-        return stringStringHashMap.get(s);
+        return stringStringHashMap.get(monthName);
     }
 
-    public static ArrayList<Day> getDatesForMonth(String month) {
+    public static ArrayList<Day> getDataForMonth(String month) {
         RealmQuery<Item> itemRealmQuery = realm.where(Item.class);
         RealmResults<Item> realmResults = itemRealmQuery.findAll();
 
@@ -249,4 +252,14 @@ public class Utils {
         return days;
 
     }
+
+    public static ArrayList<Item> getExpenditureForItem(String itemName){
+        RealmQuery<Item> itemRealmQuery = realm.where(Item.class).equalTo("reason",itemName, Case.INSENSITIVE);
+        RealmResults<Item> realmResults = itemRealmQuery.findAll();
+
+        return null;
+
+
+    }
+
 }

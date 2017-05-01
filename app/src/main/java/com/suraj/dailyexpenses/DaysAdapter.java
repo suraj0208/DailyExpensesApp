@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
 import com.suraj.dailyexpenses.data.Day;
-import com.suraj.dailyexpenses.data.Item;
 
 import java.util.List;
 

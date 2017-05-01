@@ -65,13 +65,14 @@ public class MainActivity extends AppCompatActivity {
 
         Utils.initRealm(getApplicationContext());
         showTodayExpenditure();
+        Utils.getExpenditureForItem("Breakfast");
     }
 
     private void initViewButtons() {
         (findViewById(R.id.btnViewDay)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, ViewExpensesActivity.class).putExtra("date",tvDate.getText().toString()));
+                startActivity(new Intent(MainActivity.this, ViewExpensesActivity.class).putExtra(Utils.DATE_INTENT_STRING,tvDate.getText().toString()));
             }
         });
 
@@ -90,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
         //showDate(dayOfWeek, year, month + 1, day);
 
-        tvTodayExpenditure.setText(getResources().getString(R.string.todaysExpenditure, Utils.getExpenditure(tvDate.getText().toString())));
+        tvTodayExpenditure.setText(getResources().getString(R.string.todaysExpenditure, Utils.getExpenditureForDate(tvDate.getText().toString())));
     }
 
     private void initSaveButton() {
@@ -105,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 Utils.saveInDatabase(tvDate.getText().toString(), etSpendReason.getText().toString(), Integer.parseInt(etSpentAmount.getText().toString()));
-                tvTodayExpenditure.setText(getResources().getString(R.string.todaysExpenditure, Utils.getExpenditure(tvDate.getText().toString())));
+                tvTodayExpenditure.setText(getResources().getString(R.string.todaysExpenditure, Utils.getExpenditureForDate(tvDate.getText().toString())));
                 etSpentAmount.setText("");
                 etSpendReason.setText("");
                 MainActivity.this.closeIME(etSpendReason);
@@ -237,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
             };
 
     private void showDate(int dayOfWeek, int year, int month, int day) {
-        tvDate.setText(new StringBuilder().append(Utils.getDayOfWeekText(dayOfWeek)).append(" ").append(day).append("/")
+        tvDate.setText(new StringBuilder().append(Utils.getDayOfWeekString(dayOfWeek)).append(" ").append(day).append("/")
                 .append(month).append("/").append(year));
     }
 
