@@ -36,6 +36,7 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
         listViewExpensesDays = (ListView) findViewById(R.id.lstViewDaysOfMonth);
 
         ArrayList<String> monthList = Utils.getMonthsFromDatabase();
+        Collections.sort(monthList,Utils.monthComparator);
         spinMonth.setAdapter(new ArrayAdapter<>(MonthExpensesActivity.this, android.R.layout.simple_spinner_dropdown_item, monthList));
         tvExpenditureForMonth.setText(getResources().getString(R.string.expnditureMonth, Utils.getExpensesForMonth(Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString()))));
 

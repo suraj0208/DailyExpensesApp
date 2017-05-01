@@ -31,6 +31,8 @@ public class Utils {
     public static Context context;
 
     public static Comparator<Object> dateComparator;
+    public static Comparator<String> monthComparator;
+
 
     private static RealmResults<Item> tempRealmResults;
 
@@ -40,6 +42,7 @@ public class Utils {
         Utils.context = context;
 
         dateComparator = getDateComparator();
+        monthComparator = getMonthComparator();
 
     }
 
@@ -87,6 +90,14 @@ public class Utils {
                         return day1 - day2;
                     }
                 }
+            }
+        };
+    }
+    private static Comparator<String> getMonthComparator() {
+        return new Comparator<String>() {
+            @Override
+            public int compare(String s_o, String t1_o) {
+                return getMonthNumberFromString(s_o)-getMonthNumberFromString(t1_o);
             }
         };
     }

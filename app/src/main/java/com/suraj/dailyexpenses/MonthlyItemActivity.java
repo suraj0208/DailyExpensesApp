@@ -44,6 +44,7 @@ public class MonthlyItemActivity extends AppCompatActivity {
 
         spinMonths = (Spinner) findViewById(R.id.spinMonths);
         monthList = Utils.getMonthsFromDatabase();
+        Collections.sort(monthList,Utils.monthComparator);
         spinMonths.setAdapter(new ArrayAdapter<>(MonthlyItemActivity.this, android.R.layout.simple_spinner_dropdown_item, monthList));
 
 
