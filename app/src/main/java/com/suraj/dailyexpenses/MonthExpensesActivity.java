@@ -39,7 +39,7 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
 
         if (getIntent().getStringExtra(Utils.MONTH_NUMBER_INTENT_STRING) == null) {
             spinMonth.setSelection(monthList.size() - 1);
-            monthNumber = ""+Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString());
+            monthNumber = "" + Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString());
             basicItems = Utils.getDataForMonth(monthNumber);
         } else {
             monthNumber = getIntent().getStringExtra(Utils.MONTH_NUMBER_INTENT_STRING);
@@ -47,11 +47,17 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
 
             String monthName = Utils.getMonthNameFromNumber(Integer.parseInt(monthNumber));
 
-            for (int i = 0; i < monthList.size(); i++) {
-                if(monthList.get(i).equals(monthName)){
+            int i;
+            for (i = 0; i < monthList.size(); i++) {
+                if (monthList.get(i).equals(monthName)) {
                     spinMonth.setSelection(i);
                     break;
                 }
+            }
+
+            if (i == monthList.size()) {
+                monthList.add(monthName);
+                spinMonth.setSelection(monthList.size() - 1);
             }
         }
 
@@ -88,7 +94,7 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
     }
 
     private void updateListView() {
-        monthNumber = ""+Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString());
+        monthNumber = "" + Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString());
         basicItems = Utils.getDataForMonth(monthNumber);
         Collections.sort(basicItems, Utils.dateComparator);
 

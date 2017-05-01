@@ -100,12 +100,12 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
             }
         });
 
-        tvExpenditureForMonth.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btnViewForMonth).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(ViewExpensesActivity.this, MonthExpensesActivity.class);
-                ;
-                intent.putExtra(Utils.DATE_INTENT_STRING, spinDates.getSelectedItem().toString().split("/")[1]);
+
+                intent.putExtra(Utils.MONTH_NUMBER_INTENT_STRING, spinDates.getSelectedItem().toString().split("/")[1]);
                 startActivity(intent);
             }
         });
