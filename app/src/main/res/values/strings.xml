@@ -32,6 +32,8 @@
 
     <string name="expnditureMonth">Total expenditure of month: Rs. %1$s</string>
 
+    <string name="expnditureForItem">Total expenditure for %1$s: Rs. %2$s</string>
+
 
     <string name="validDataError">Enter valid data</string>
 </resources>

@@ -3,7 +3,7 @@ package com.suraj.dailyexpenses;
 import android.content.Context;
 import android.widget.Toast;
 
-import com.suraj.dailyexpenses.data.Day;
+import com.suraj.dailyexpenses.data.BasicItem;
 import com.suraj.dailyexpenses.data.Item;
 
 import java.util.ArrayList;
@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.TreeMap;
 
 import io.realm.Case;
@@ -24,11 +25,14 @@ import io.realm.RealmResults;
 public class Utils {
     public static final String MONTH_NUMBER_INTENT_STRING = "monthNumber";
     public static final String DATE_INTENT_STRING = "date";
+    public static final String ITEM_INTENT_STRING = "item";
 
     private static Realm realm;
-    private static Context context;
+    public static Context context;
 
     public static Comparator<Object> dateComparator;
+
+    private static RealmResults<Item> tempRealmResults;
 
     public static void initRealm(Context context) {
         Realm.init(context);
@@ -39,7 +43,7 @@ public class Utils {
 
     }
 
-    private static Comparator<Object> getDateComparator(){
+    private static Comparator<Object> getDateComparator() {
         return new Comparator<Object>() {
             @Override
             public int compare(Object s_o, Object t1_o) {
@@ -48,10 +52,21 @@ public class Utils {
                 if (s_o instanceof String && t1_o instanceof String) {
                     s = (String) s_o;
                     t1 = (String) t1_o;
-                }else if (s_o instanceof Day && t1_o instanceof Day){
-                    s=((Day)s_o).getDate();
-                    t1=((Day)t1_o).getDate();
-                }else{
+                } else if (s_o instanceof BasicItem && t1_o instanceof BasicItem) {
+                    BasicItem b1 = ((BasicItem) s_o);
+                    BasicItem b2 = ((BasicItem) t1_o);
+
+                    if (b1.getYear() != b2.getYear()) {
+                        return b1.getYear() - b2.getYear();
+                    } else {
+                        if (b1.getMonth() != b2.getMonth()) {
+                            return b1.getMonth() - b2.getMonth();
+                        } else {
+                            return b1.getDay() - b2.getDay();
+                        }
+                    }
+
+                } else {
                     return -1;
                 }
 
@@ -173,53 +188,53 @@ public class Utils {
 
             String currentMonth = date.split("/")[1];
 
-            monthSet.add(getMonthStringFromNumber(Integer.parseInt(currentMonth)));
+            monthSet.add(getMonthNameFromNumber(Integer.parseInt(currentMonth)));
         }
 
         return new ArrayList<>(monthSet);
     }
 
-    public static int getExpensesForMonth(String month) {
+    public static int getExpensesForMonth(int month) {
         RealmQuery<Item> itemRealmQuery = realm.where(Item.class);
         RealmResults<Item> realmResults = itemRealmQuery.findAll();
         int sum = 0;
         for (Item item : realmResults) {
             String date = item.getDate();
 
-            String currentMonth = date.split("/")[1];
+            int currentMonth = Integer.parseInt(date.split("/")[1]);
 
-            if (currentMonth.equals(month)) {
+            if (currentMonth==month) {
                 sum += item.getAmount();
             }
         }
         return sum;
     }
 
-    public static String getMonthStringFromNumber(int month) {
+    public static String getMonthNameFromNumber(int month) {
         String[] months = {"PLACE_HOLDER", "Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"};
         return months[month];
     }
 
-    public static String getMonthNumberFromString(String monthName) {
-        HashMap<String, String> stringStringHashMap = new HashMap<>();
+    public static int getMonthNumberFromString(String monthName) {
+        HashMap<String, Integer> stringStringHashMap = new HashMap<>();
 
-        stringStringHashMap.put("Jan", "1");
-        stringStringHashMap.put("Feb", "2");
-        stringStringHashMap.put("Mar", "3");
-        stringStringHashMap.put("Apr", "4");
-        stringStringHashMap.put("May", "5");
-        stringStringHashMap.put("June", "6");
-        stringStringHashMap.put("July", "7");
-        stringStringHashMap.put("Aug", "8");
-        stringStringHashMap.put("Sept", "9");
-        stringStringHashMap.put("Oct", "10");
-        stringStringHashMap.put("Nov", "11");
-        stringStringHashMap.put("Dec", "12");
+        stringStringHashMap.put("Jan", 1);
+        stringStringHashMap.put("Feb", 2);
+        stringStringHashMap.put("Mar", 3);
+        stringStringHashMap.put("Apr", 4);
+        stringStringHashMap.put("May", 5);
+        stringStringHashMap.put("June",6);
+        stringStringHashMap.put("July", 7);
+        stringStringHashMap.put("Aug", 8);
+        stringStringHashMap.put("Sept", 9);
+        stringStringHashMap.put("Oct", 10);
+        stringStringHashMap.put("Nov", 11);
+        stringStringHashMap.put("Dec", 12);
 
         return stringStringHashMap.get(monthName);
     }
 
-    public static ArrayList<Day> getDataForMonth(String month) {
+    public static ArrayList<BasicItem> getDataForMonth(String month) {
         RealmQuery<Item> itemRealmQuery = realm.where(Item.class);
         RealmResults<Item> realmResults = itemRealmQuery.findAll();
 
@@ -241,25 +256,97 @@ public class Utils {
             }
         }
 
-        ArrayList<Day> days = new ArrayList<>();
+        ArrayList<BasicItem> basicItems = new ArrayList<>();
 
         for (String date : monthExpensesTreeMap.keySet()) {
-            Day day = new Day();
-            day.setDate(date);
-            day.setExpenses(monthExpensesTreeMap.get(date));
-            days.add(day);
+            BasicItem basicItem = new BasicItem();
+            basicItem.setDate(date);
+            basicItem.setAmount(monthExpensesTreeMap.get(date));
+            basicItems.add(basicItem);
         }
-        return days;
+        return basicItems;
 
     }
 
-    public static ArrayList<Item> getExpenditureForItem(String itemName){
-        RealmQuery<Item> itemRealmQuery = realm.where(Item.class).equalTo("reason",itemName, Case.INSENSITIVE);
+    public static ArrayList<BasicItem> getExpenditureForItem(String itemName) {
+        RealmQuery<Item> itemRealmQuery = realm.where(Item.class).equalTo("reason", itemName, Case.INSENSITIVE);
         RealmResults<Item> realmResults = itemRealmQuery.findAll();
 
-        return null;
+        tempRealmResults = realmResults;
 
+        HashMap<Integer, Integer> monthItemExpenses = new HashMap<>();
+
+        for (Item item : realmResults) {
+
+            String date = item.getDate();
+
+            int currentMonth = Integer.parseInt(date.split("/")[1]);
+            Integer current = monthItemExpenses.get(currentMonth);
+
+            if (current == null) {
+                monthItemExpenses.put(currentMonth, item.getAmount());
+            } else {
+                monthItemExpenses.put(currentMonth, current + item.getAmount());
+            }
+        }
+
+        ArrayList<BasicItem> basicItems = new ArrayList<>();
+
+        for (Integer month : monthItemExpenses.keySet()) {
+            BasicItem basicItem = new BasicItem();
+            basicItem.setMonth(month);
+            basicItem.setAmount(monthItemExpenses.get(month));
+            basicItems.add(basicItem);
+        }
+
+        return basicItems;
 
     }
 
+    public static int getSum(List<BasicItem> basicItemList) {
+        int sum =0 ;
+        for(BasicItem basicItem:basicItemList)
+            sum+=basicItem.getAmount();
+
+        return sum;
+    }
+
+    public static ArrayList<BasicItem> getExpenditureForItemForMonth(int clickedMonth) {
+        RealmResults<Item> realmResults = tempRealmResults;
+
+
+        HashMap<String, Integer> monthItemExpenses = new HashMap<>();
+
+        for (Item item : realmResults) {
+
+            String date = item.getDate();
+
+            if(Integer.parseInt(date.split("/")[1])!=clickedMonth)
+                continue;
+
+
+            Integer current = monthItemExpenses.get(date);
+
+            if (current == null) {
+                monthItemExpenses.put(date, item.getAmount());
+            } else {
+                monthItemExpenses.put(date, current + item.getAmount());
+            }
+        }
+
+        ArrayList<BasicItem> basicItems = new ArrayList<>();
+
+        for (String date : monthItemExpenses.keySet()) {
+            BasicItem basicItem = new BasicItem();
+            basicItem.setDate(date);
+            basicItem.setAmount(monthItemExpenses.get(date));
+            basicItems.add(basicItem);
+        }
+
+        return basicItems;
+    }
+
+    private static void invalidateTempResults(){
+        tempRealmResults = null;
+    }
 }

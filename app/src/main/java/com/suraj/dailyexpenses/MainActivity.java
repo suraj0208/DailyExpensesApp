@@ -14,6 +14,9 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.suraj.dailyexpenses.data.BasicItem;
+
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 
@@ -65,7 +68,12 @@ public class MainActivity extends AppCompatActivity {
 
         Utils.initRealm(getApplicationContext());
         showTodayExpenditure();
-        Utils.getExpenditureForItem("Breakfast");
+        if(getIntent().getParcelableArrayListExtra("test")!=null){
+            ArrayList<BasicItem> list = (ArrayList<BasicItem>) getIntent().getSerializableExtra("test");
+            for(BasicItem basicItem:list){
+                System.out.println(basicItem.getMonth() + " " + basicItem.getAmount());
+            }
+        }
     }
 
     private void initViewButtons() {

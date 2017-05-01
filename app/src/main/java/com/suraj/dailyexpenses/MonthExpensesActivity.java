@@ -11,14 +11,14 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.suraj.dailyexpenses.data.Day;
+import com.suraj.dailyexpenses.data.BasicItem;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
 public class MonthExpensesActivity extends AppCompatActivity implements InflationManager {
     private String monthNumber;
-    private ArrayList<Day> days;
+    private ArrayList<BasicItem> basicItems;
 
     private Spinner spinMonth;
     private TextView tvExpenditureForMonth;
@@ -39,13 +39,13 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
 
         if (getIntent().getStringExtra(Utils.MONTH_NUMBER_INTENT_STRING) == null) {
             spinMonth.setSelection(monthList.size() - 1);
-            monthNumber = Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString());
-            days = Utils.getDataForMonth(monthNumber);
+            monthNumber = ""+Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString());
+            basicItems = Utils.getDataForMonth(monthNumber);
         } else {
             monthNumber = getIntent().getStringExtra(Utils.MONTH_NUMBER_INTENT_STRING);
-            days = Utils.getDataForMonth(monthNumber);
+            basicItems = Utils.getDataForMonth(monthNumber);
 
-            String monthName = Utils.getMonthStringFromNumber(Integer.parseInt(monthNumber));
+            String monthName = Utils.getMonthNameFromNumber(Integer.parseInt(monthNumber));
 
             for (int i = 0; i < monthList.size(); i++) {
                 if(monthList.get(i).equals(monthName)){
@@ -60,9 +60,9 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
         listViewExpensesDays.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                String date = days.get(i).getDate();
+                String date = basicItems.get(i).getDate();
                 Intent intent = new Intent(MonthExpensesActivity.this, ViewExpensesActivity.class);
-                intent.putExtra("date", date);
+                intent.putExtra(Utils.DATE_INTENT_STRING, date);
                 startActivity(intent);
             }
         });
@@ -82,19 +82,18 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
 
     @Override
     public void onGetView(int position, View rowView, ViewGroup parent) {
-        Day day = days.get(position);
-        ((TextView) rowView.findViewById(R.id.tvItemName)).setText(day.getDate());
-        ((TextView) rowView.findViewById(R.id.tvItemAmount)).setText(getResources().getString(R.string.rs, day.getExpenses()));
-
+        BasicItem basicItem = basicItems.get(position);
+        ((TextView) rowView.findViewById(R.id.tvItemName)).setText(basicItem.getDate());
+        ((TextView) rowView.findViewById(R.id.tvItemAmount)).setText(getResources().getString(R.string.rs, basicItem.getAmount()));
     }
 
     private void updateListView() {
-        monthNumber = Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString());
-        days = Utils.getDataForMonth(monthNumber);
-        Collections.sort(days, Utils.dateComparator);
+        monthNumber = ""+Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString());
+        basicItems = Utils.getDataForMonth(monthNumber);
+        Collections.sort(basicItems, Utils.dateComparator);
 
-        DaysAdapter daysAdapter = new DaysAdapter(getApplicationContext(), days, this);
-        listViewExpensesDays.setAdapter(daysAdapter);
+        BasicItemsAdapter basicItemsAdapter = new BasicItemsAdapter(getApplicationContext(), basicItems, this);
+        listViewExpensesDays.setAdapter(basicItemsAdapter);
         tvExpenditureForMonth.setText(getResources().getString(R.string.expnditureMonth, Utils.getExpensesForMonth(Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString()))));
 
     }

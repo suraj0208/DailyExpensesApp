@@ -91,6 +91,15 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
             }
         });
 
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent  intent   = new Intent(ViewExpensesActivity.this,MonthlyItemActivity.class);
+                intent.putExtra(Utils.ITEM_INTENT_STRING,items.get(i).getReason());
+                startActivity(intent);
+            }
+        });
+
         tvExpenditureForMonth.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -107,7 +116,7 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
         String date = spinDates.getSelectedItem().toString();
         listView.setAdapter(new ItemsAdapter(getApplicationContext(), items, this));
         tvExpenditureForDate.setText(getResources().getString(R.string.expnditureDay, Utils.getExpenditureForDate(date)));
-        tvExpenditureForMonth.setText(getResources().getString(R.string.expnditureMonth, Utils.getExpensesForMonth(date.split("/")[1])));
+        tvExpenditureForMonth.setText(getResources().getString(R.string.expnditureMonth, Utils.getExpensesForMonth(Integer.parseInt(date.split("/")[1]))));
     }
 
     @Override

@@ -1,15 +1,17 @@
 package com.suraj.dailyexpenses.data;
 
+import java.io.Serializable;
+
 /**
  * Created by suraj on 1/5/17.
  */
-public class BasicItem {
+public class BasicItem implements Serializable{
     private String date;
-
     private String dayName;
     private int day;
     private int month;
     private int year;
+
 
     public String getDayName() {
         return dayName;
@@ -55,7 +57,7 @@ public class BasicItem {
         this.date = date;
 
         String[] splts = date.split("/");
-        String[] splts1 = date.split(" ");
+        String[] splts1 = splts[0].split(" ");
 
         dayName = splts1[0];
 
@@ -81,7 +83,6 @@ public class BasicItem {
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
-
 
 
 }

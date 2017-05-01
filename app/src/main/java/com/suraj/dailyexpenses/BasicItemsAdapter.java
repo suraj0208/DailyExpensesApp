@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
-import com.suraj.dailyexpenses.data.Day;
+import com.suraj.dailyexpenses.data.BasicItem;
 
 import java.util.List;
 
@@ -14,22 +14,22 @@ import java.util.List;
  * Created by suraj on 29/3/17.
  */
 public class BasicItemsAdapter extends ArrayAdapter{
-    private List<Day> daysList;
+    private List<BasicItem> basicItemsList;
     private Context context;
     private InflationManager inflationManager;
 
 
-    public BasicItemsAdapter(Context context, List<Day> daysList, InflationManager inflationManager) {
+    public BasicItemsAdapter(Context context, List<BasicItem> basicItemsList, InflationManager inflationManager) {
         super(context, R.layout.item_row);
 
-        this.daysList = daysList;
+        this.basicItemsList = basicItemsList;
         this.context = context;
         this.inflationManager = inflationManager;
     }
 
     @Override
     public int getCount() {
-        return daysList.size();
+        return basicItemsList.size();
 
     }
 
