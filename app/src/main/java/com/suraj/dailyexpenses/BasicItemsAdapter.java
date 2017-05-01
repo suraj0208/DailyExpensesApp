@@ -13,13 +13,13 @@ import java.util.List;
 /**
  * Created by suraj on 29/3/17.
  */
-public class DaysAdapter  extends ArrayAdapter{
+public class BasicItemsAdapter extends ArrayAdapter{
     private List<Day> daysList;
     private Context context;
     private InflationManager inflationManager;
 
 
-    public DaysAdapter(Context context, List<Day> daysList, InflationManager inflationManager) {
+    public BasicItemsAdapter(Context context, List<Day> daysList, InflationManager inflationManager) {
         super(context, R.layout.item_row);
 
         this.daysList = daysList;
