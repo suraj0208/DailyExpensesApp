@@ -23,6 +23,8 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
     private TextView tvExpenditureForMonth;
     private ListView listView;
 
+    private static  ViewExpensesActivity viewExpensesActivity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,6 +111,11 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
                 startActivity(intent);
             }
         });
+
+        if(viewExpensesActivity!=null){
+            viewExpensesActivity.finish();
+        }
+        viewExpensesActivity=this;
 
     }
 

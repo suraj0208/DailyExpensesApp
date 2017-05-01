@@ -24,6 +24,8 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
     private TextView tvExpenditureForMonth;
     private ListView listViewExpensesDays;
 
+    private static MonthExpensesActivity monthExpensesActivity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,6 +86,13 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
 
             }
         });
+
+        if(monthExpensesActivity!=null){
+            monthExpensesActivity.finish();
+        }
+        monthExpensesActivity=this;
+
+
     }
 
     @Override
