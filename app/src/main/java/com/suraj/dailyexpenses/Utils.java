@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import io.realm.Case;
@@ -359,5 +360,50 @@ public class Utils {
 
     private static void invalidateTempResults(){
         tempRealmResults = null;
+    }
+
+
+    public static HashMap<String,Integer> getTopItemsForMonth(int month){
+        RealmQuery<Item> itemRealmQuery = realm.where(Item.class);
+
+        RealmResults<Item> realmResults = itemRealmQuery.findAll();
+
+        HashMap<String, Integer> monthItemExpenses = new HashMap<>();
+
+        for (Item item : realmResults) {
+
+            String date = item.getDate();
+
+            int currentMonth = Integer.parseInt(date.split("/")[1]);
+
+            if(currentMonth!=month)
+                continue;
+
+
+            Integer current = monthItemExpenses.get(item.getReason());
+
+            if (current == null) {
+                monthItemExpenses.put(item.getReason(), item.getAmount());
+            } else {
+                monthItemExpenses.put(item.getReason(), current + item.getAmount());
+            }
+        }
+
+        HashMap<String, Integer> stringIntegerHashMap = new HashMap<>();
+
+        ArrayList<Map.Entry<String,Integer>> entries =  new ArrayList<>(monthItemExpenses.entrySet());
+
+        Collections.sort(entries, new Comparator<Map.Entry<String, Integer>>() {
+            @Override
+            public int compare(Map.Entry<String, Integer> integerIntegerEntry, Map.Entry<String, Integer> t1) {
+                return t1.getValue()-integerIntegerEntry.getValue();
+            }
+        });
+
+        for(int i=0;i<4;i++){
+            stringIntegerHashMap.put(entries.get(i).getKey(),entries.get(i).getValue());
+        }
+
+        return stringIntegerHashMap;
     }
 }

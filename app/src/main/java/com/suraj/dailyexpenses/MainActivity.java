@@ -13,10 +13,6 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import com.suraj.dailyexpenses.data.BasicItem;
-
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 
@@ -68,12 +64,27 @@ public class MainActivity extends AppCompatActivity {
 
         Utils.initRealm(getApplicationContext());
         showTodayExpenditure();
-        if(getIntent().getParcelableArrayListExtra("test")!=null){
-            ArrayList<BasicItem> list = (ArrayList<BasicItem>) getIntent().getSerializableExtra("test");
-            for(BasicItem basicItem:list){
-                System.out.println(basicItem.getMonth() + " " + basicItem.getAmount());
-            }
-        }
+
+//        HashMap<String,Integer> stringIntegerHashMap = Utils.getTopItemsForMonth(4);
+//
+//        int total = Utils.getExpensesForMonth(4);
+//        System.out.println("total " + total);
+//
+//        int i=0;
+//
+//        for(String k:stringIntegerHashMap.keySet()){
+//            System.out.println(k+ " " +stringIntegerHashMap.get(k));
+//            PieChartActivity.angles[i] = ((double)(stringIntegerHashMap.get(k)*360))/total;
+//            i++;
+//        }
+//        startActivity(new Intent(MainActivity.this, PieChartActivity.class));
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        showTodayExpenditure();
     }
 
     private void initViewButtons() {

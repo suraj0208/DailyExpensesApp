@@ -1,7 +1,9 @@
 package com.suraj.dailyexpenses;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +25,7 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
     private TextView tvExpenditureForMonth;
     private ListView listView;
 
-    private static  ViewExpensesActivity viewExpensesActivity;
+    private static ViewExpensesActivity viewExpensesActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,20 +86,30 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
 
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Utils.deleteFromDatabase(items.get(i));
-                items.remove(i);
-                updateListView();
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int i, long l) {
 
-                return false;
+                new AlertDialog.Builder(ViewExpensesActivity.this)
+                        .setTitle("Sure?")
+                        .setMessage("Delete selected item?")
+                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Utils.deleteFromDatabase(items.get(i));
+                                items.remove(i);
+                                updateListView();
+                            }
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+                return true;
             }
         });
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent  intent   = new Intent(ViewExpensesActivity.this,MonthlyItemActivity.class);
-                intent.putExtra(Utils.ITEM_INTENT_STRING,items.get(i).getReason());
+                Intent intent = new Intent(ViewExpensesActivity.this, MonthlyItemActivity.class);
+                intent.putExtra(Utils.ITEM_INTENT_STRING, items.get(i).getReason());
                 startActivity(intent);
             }
         });
@@ -112,10 +124,10 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
             }
         });
 
-        if(viewExpensesActivity!=null){
+        if (viewExpensesActivity != null) {
             viewExpensesActivity.finish();
         }
-        viewExpensesActivity=this;
+        viewExpensesActivity = this;
 
     }
 
