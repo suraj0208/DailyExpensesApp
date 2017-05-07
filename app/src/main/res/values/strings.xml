@@ -21,11 +21,13 @@
     <string name="spentReasonAmountHint">Amount</string>
 
     <string name="view">Today\'s\n Details</string>
+
     <string name="viewMonth">Monthly\n Details</string>
 
     <string name="save">Save</string>
 
     <string name="todaysExpenditure">Today\'s Expenditure: Rs. %1$s</string>
+
     <string name="rs">Rs. %1$s</string>
 
     <string name="expnditureDay">Total expenditure: Rs. %1$s</string>
@@ -34,6 +36,24 @@
 
     <string name="expnditureForItem">Total expenditure for %1$s: Rs. %2$s</string>
 
-
     <string name="validDataError">Enter valid data</string>
+
+    <string name="exportSpecificDay">Export current date\'s data</string>
+
+    <string name="exportDatabase">Export entire database</string>
+
+    <string name="error">Error occurred</string>
+
+    <string name="enterFileName">Enter file name</string>
+
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="tipSetDate">Pick Date</string>
+    <string name="tipCommonItems">Quickly add common items</string>
+    <string name="tipadjustAndSave">Easily adjust and save</string>
+    <string name="tipOk">Okay!</string>
+    <string name="tipGotIt">Got It</string>
+    <string name="tipStart">Lets Start</string>
+
 </resources>

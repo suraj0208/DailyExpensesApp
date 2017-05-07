@@ -3,6 +3,7 @@ package com.suraj.dailyexpenses;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -13,8 +14,15 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import java.lang.reflect.Field;
 import java.util.Calendar;
 import java.util.HashSet;
+import java.util.Queue;
+
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
 public class MainActivity extends AppCompatActivity {
     private int year;
@@ -64,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
         Utils.initRealm(getApplicationContext());
         showTodayExpenditure();
+        setupTips();
 
 //        HashMap<String,Integer> stringIntegerHashMap = Utils.getTopItemsForMonth(4);
 //
@@ -81,6 +90,65 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void setupTips() {
+        ShowcaseConfig config = new ShowcaseConfig();
+        config.setDelay(100); // half second between each showcase view
+
+        MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(this);
+
+        sequence.setConfig(config);
+
+//        sequence.addSequenceItem(findViewById(R.id.btnSetDate),
+//                "Pick a date", "GOT IT");
+//
+//        sequence.addSequenceItem(findViewById(R.id.hzScrollViewReasons),
+//                "Quickly add common items", "Okay!");
+//
+//        sequence.addSequenceItem(findViewById(R.id.llPlusMinusButtons),
+//                "Adjust and save amount easily", "Lets Start");
+
+
+        try {
+            Field field = sequence.getClass().getDeclaredField("mShowcaseQueue");
+            field.setAccessible(true);
+
+            Queue<MaterialShowcaseView> queue  = (Queue<MaterialShowcaseView>)field.get(sequence);
+
+            MaterialShowcaseView materialShowcaseViewDate = buildMaterialShowcaseView(findViewById(R.id.btnSetDate), getString(R.string.tipGotIt), getString(R.string.tipSetDate));
+
+            MaterialShowcaseView materialShowcaseViewCommonItems = buildMaterialShowcaseView(findViewById(R.id.hzScrollViewReasons), getString(R.string.tipOk), getString(R.string.tipCommonItems));
+
+            MaterialShowcaseView materialShowcaseViewAdjust = buildMaterialShowcaseView(findViewById(R.id.llPlusMinusButtons), getString(R.string.tipStart), getString(R.string.tipadjustAndSave));
+
+            materialShowcaseViewDate.setConfig(config);
+            materialShowcaseViewCommonItems.setConfig(config);
+            materialShowcaseViewAdjust.setConfig(config);
+
+            queue.add(materialShowcaseViewDate);
+            queue.add(materialShowcaseViewCommonItems);
+            queue.add(materialShowcaseViewAdjust);
+
+            sequence.start();
+
+
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    private MaterialShowcaseView buildMaterialShowcaseView(View view, String dismiss, String content){
+        return new MaterialShowcaseView.Builder(this)
+                .setTarget(view)
+                .setDismissText(dismiss)
+                .setContentText(content)
+                .setDismissOnTouch(true)
+                .setDismissOnTargetTouch(true)
+                .build();
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -91,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
         (findViewById(R.id.btnViewDay)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, ViewExpensesActivity.class).putExtra(Utils.DATE_INTENT_STRING,tvDate.getText().toString()));
+                startActivity(new Intent(MainActivity.this, ViewExpensesActivity.class).putExtra(Utils.DATE_INTENT_STRING, tvDate.getText().toString()));
             }
         });
 
@@ -158,12 +226,12 @@ public class MainActivity extends AppCompatActivity {
         (findViewById(R.id.btnAmountPlus)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try{
+                try {
                     int amount = Integer.parseInt(etSpentAmount.getText().toString());
                     amount++;
-                    etSpentAmount.setText(""+amount);
+                    etSpentAmount.setText("" + amount);
 
-                }catch (NumberFormatException ne){
+                } catch (NumberFormatException ne) {
                     ne.printStackTrace();
                 }
 
@@ -173,15 +241,15 @@ public class MainActivity extends AppCompatActivity {
         (findViewById(R.id.btnAmountMinus)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try{
+                try {
                     int amount = Integer.parseInt(etSpentAmount.getText().toString());
                     amount--;
 
-                    if(amount<0)
-                        amount=0;
+                    if (amount < 0)
+                        amount = 0;
 
-                    etSpentAmount.setText(""+amount);
-                }catch (NumberFormatException ne){
+                    etSpentAmount.setText("" + amount);
+                } catch (NumberFormatException ne) {
                     ne.printStackTrace();
                 }
             }
@@ -204,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
                 (Button) findViewById(R.id.btnSnacksText),
                 (Button) findViewById(R.id.btnLunchText),
                 (Button) findViewById(R.id.btnDinnerText),
-                };
+        };
 
         for (int i = 0; i < btnReasons.length; i++) {
             final int index = i;
@@ -224,13 +292,13 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if(etSpendReason.getText().length()==0){
+                if (etSpendReason.getText().length() == 0) {
                     hzScrollView.setVisibility(View.VISIBLE);
-                }else{
+                } else {
                     hzScrollView.setVisibility(View.GONE);
                 }
 
-                if(commonReasons.contains(etSpendReason.getText().toString())){
+                if (commonReasons.contains(etSpendReason.getText().toString())) {
                     hzScrollView.setVisibility(View.VISIBLE);
                 }
             }
@@ -271,13 +339,12 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
-    public void closeIME(View view){
+    public void closeIME(View view) {
         if (view != null) {
             InputMethodManager imm = (InputMethodManager) getSystemService(getApplicationContext().INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
-
 
 
 }
