@@ -4,15 +4,16 @@
     tools:context=".ui.MainActivity">
 
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_exportSpecific"
         android:orderInCategory="100"
-        android:title="Settings"
+        android:title="@string/exportSpecificDay"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_share"
+        android:id="@+id/action_exportEntire"
         android:orderInCategory="100"
-        android:title="Share"
-        android:icon="@drawable/ic_share"
-        app:showAsAction="always" />
+        android:title="@string/exportDatabase"
+        app:showAsAction="never" />
+
+
 </menu>
