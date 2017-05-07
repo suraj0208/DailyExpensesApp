@@ -1,6 +1,7 @@
 package com.suraj.dailyexpenses;
 
 import android.content.Context;
+import android.os.Environment;
 import android.widget.Toast;
 
 import com.suraj.dailyexpenses.data.BasicItem;
@@ -27,6 +28,9 @@ public class Utils {
     public static final String MONTH_NUMBER_INTENT_STRING = "monthNumber";
     public static final String DATE_INTENT_STRING = "date";
     public static final String ITEM_INTENT_STRING = "item";
+
+    public static final String SDCARD_DIRECTORY = Environment.getExternalStorageDirectory() + "/DailyExpenses";
+
 
     private static Realm realm;
     public static Context context;
@@ -70,7 +74,34 @@ public class Utils {
                         }
                     }
 
-                } else {
+                }else if (s_o instanceof Item && t1_o instanceof Item) {
+                    Item b1 = ((Item) s_o);
+                    Item b2 = ((Item) t1_o);
+
+                    String splts[] = b1.getDate().split("/");
+
+                    int day1 = Integer.parseInt(splts[0].split(" ")[1]);
+                    int month1 = Integer.parseInt(splts[1]);
+                    int year1 = Integer.parseInt(splts[2]);
+
+                    splts = b2.getDate().split("/");
+
+                    int day2 = Integer.parseInt(splts[0].split(" ")[1]);
+                    int month2 = Integer.parseInt(splts[1]);
+                    int year2 = Integer.parseInt(splts[2]);
+
+                    if (year1 != year2) {
+                        return year1 - year2;
+                    } else {
+                        if (month1 != month2) {
+                            return month1 - month2;
+                        } else {
+                            return day1 - day2;
+                        }
+                    }
+
+                }
+                else {
                     return -1;
                 }
 
@@ -124,7 +155,22 @@ public class Utils {
         return false;
     }
 
-    public static ArrayList<Item> getItemsForDate(String date) {
+    public static ArrayList<Item> getAllItemsFromDatabase() {
+        RealmQuery<Item>  itemRealmQuery = realm.where(Item.class);
+
+        ArrayList<Item> items = new ArrayList<>();
+
+        for(Item item:itemRealmQuery.findAll()){
+            items.add(item);
+        }
+
+        Collections.sort(items,dateComparator);
+
+        return items;
+    }
+
+
+        public static ArrayList<Item> getItemsForDate(String date) {
         RealmQuery<Item> realmQuery = realm.where(Item.class).equalTo("date", date);
 
         ArrayList<Item> results = new ArrayList<>();
@@ -406,4 +452,5 @@ public class Utils {
 
         return stringIntegerHashMap;
     }
+
 }
