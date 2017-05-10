@@ -34,7 +34,7 @@
 
     <string name="expnditureMonth">Total expenditure of month: Rs. %1$s</string>
 
-    <string name="expnditureForItem">Total expenditure for %1$s: Rs. %2$s</string>
+    <string name="expnditureForItem">Total expenditure on %1$s: Rs. %2$s</string>
 
     <string name="validDataError">Enter valid data</string>
 
@@ -49,11 +49,25 @@
     <string name="ok">Ok</string>
     <string name="cancel">Cancel</string>
 
-    <string name="tipSetDate">Pick Date</string>
+    <string name="tipSetDate">Select date</string>
     <string name="tipCommonItems">Quickly add common items</string>
-    <string name="tipadjustAndSave">Easily adjust and save</string>
+    <string name="tipadjustAndSave">Easily adjust amount and save</string>
     <string name="tipOk">Okay!</string>
     <string name="tipGotIt">Got It</string>
     <string name="tipStart">Lets Start</string>
+    <string name="tipViewForMonth">View details of current month</string>
+    <string name="tipListViewSingleClick">Click to view details of item</string>
+    <string name="tipListViewLongPress">Long press to delete item</string>
+    <string name="infrequentItem">Infrequent</string>
+    <string name="all">All</string>
+    <string name="showingAllNotify">Showing all items</string>
+    <string name="excludingInfrequentNotify">Excluding infrequent items</string>
+
+    <string name="backupCompleteNotify">Backup complete</string>
+    <string name="restoreCompleteNotify">Restore complete</string>
+
+    <string name="exportSuccessfulNotify">Successfully Exported</string>
+    <string name="backupNotFoundNotify">No recent backup found</string>
+
 
 </resources>

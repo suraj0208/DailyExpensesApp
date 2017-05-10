@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainRootRelativeLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.suraj.dailyexpenses.MainActivity">
 
     <TextView
@@ -14,30 +11,57 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
         android:text="@string/setDate" />
 
-    <Button
+    <android.support.v7.widget.AppCompatButton
         android:id="@+id/btnSetDate"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_alignBottom="@+id/tvDate"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="10dp"
         android:background="@drawable/ic_calendar" />
+
+    <CheckBox
+        android:id="@+id/chkboxInfrequent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/tvDate"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="10dp"
+        android:text="@string/infrequentItem"
+        android:visibility="gone" />
 
     <EditText
         android:id="@+id/etSpendReason"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/tvDate"
-        android:layout_marginTop="10dp"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="5dp"
+        android:layout_toLeftOf="@id/chkboxInfrequent"
+        android:layout_toStartOf="@id/chkboxInfrequent"
         android:hint="@string/spentReasonHint" />
 
     <HorizontalScrollView
         android:id="@+id/hzScrollViewReasons"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/etSpendReason"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         android:scrollbarSize="0dp">
 
@@ -46,45 +70,119 @@
             android:layout_height="match_parent"
             android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/btnBreakfastText"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginRight="20dp"
-                android:background="@drawable/ic_breakfast" />
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
-            <Button
-                android:id="@+id/btnTeaText"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginRight="20dp"
-                android:background="@drawable/ic_tea" />
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/btnBreakfastText"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginRight="20dp"
+                    android:background="@drawable/ic_breakfast" />
 
-            <Button
-                android:id="@+id/btnSnacksText"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginRight="20dp"
-                android:background="@drawable/ic_snacks1" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/btnBreakfastText"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/breakfast"
+                    android:textSize="@dimen/common_reasons_text_size" />
+            </RelativeLayout>
 
-            <Button
-                android:id="@+id/btnLunchText"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginRight="20dp"
-                android:background="@drawable/ic_lunch" />
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
-            <Button
-                android:id="@+id/btnDinnerText"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginRight="20dp"
-                android:background="@drawable/ic_dinner1" />
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/btnTeaText"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_gravity="right"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginRight="20dp"
+                    android:background="@drawable/ic_tea" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/btnTeaText"
+                    android:layout_centerHorizontal="true"
+                    android:layout_gravity="center"
+                    android:text="@string/tea"
+                    android:textSize="@dimen/common_reasons_text_size" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/btnSnacksText"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginRight="20dp"
+                    android:background="@drawable/ic_snacks" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/btnSnacksText"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/snacks"
+                    android:textSize="@dimen/common_reasons_text_size" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/btnLunchText"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginRight="20dp"
+                    android:background="@drawable/ic_lunch" />
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/btnLunchText"
+                    android:layout_centerHorizontal="true"
+                    android:layout_gravity="center"
+                    android:text="@string/lunch"
+                    android:textSize="@dimen/common_reasons_text_size" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/btnDinnerText"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginRight="20dp"
+                    android:background="@drawable/ic_dinner1" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/btnDinnerText"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/dinner"
+                    android:textSize="@dimen/common_reasons_text_size" />
+            </RelativeLayout>
 
         </LinearLayout>
 
@@ -103,42 +201,42 @@
             android:layout_height="match_parent"
             android:orientation="horizontal">
 
-            <Button
+            <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btn10"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="#00000000"
                 android:text="@string/string10" />
 
-            <Button
+            <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btn20"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="#00000000"
                 android:text="@string/string20" />
 
-            <Button
+            <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btn30"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="#00000000"
                 android:text="@string/string30" />
 
-            <Button
+            <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btn40"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="#00000000"
                 android:text="@string/string40" />
 
-            <Button
+            <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btn50"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="#00000000"
                 android:text="@string/string50" />
 
-            <Button
+            <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btn100"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -152,15 +250,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/hzScrollViewAmounts"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:orientation="horizontal">
 
         <EditText
             android:id="@+id/etSpentAmount"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:layout_weight="1"
             android:hint="@string/spentReasonAmountHint"
             android:inputType="number" />
@@ -168,9 +268,11 @@
         <RelativeLayout
             android:id="@+id/llPlusMinusButtons"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin">
 
-            <Button
+            <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btnAmountPlus"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
@@ -178,7 +280,7 @@
                 android:layout_marginRight="20dp"
                 android:background="@drawable/ic_plus" />
 
-            <Button
+            <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btnAmountMinus"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
@@ -188,7 +290,7 @@
                 android:layout_toRightOf="@id/btnAmountPlus"
                 android:background="@drawable/ic_minus" />
 
-            <Button
+            <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btnSave"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
@@ -215,7 +317,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1">
 
-            <Button
+            <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btnViewMonth"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
@@ -237,7 +339,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1">
 
-            <Button
+            <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btnViewDay"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
@@ -252,16 +354,16 @@
                 android:layout_marginTop="5dp"
                 android:text="@string/view" />
         </RelativeLayout>
-
-
     </LinearLayout>
-
 
     <TextView
         android:id="@+id/tvTodaysExpenditure"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
         android:text="@string/todaysExpenditure" />
 
 </RelativeLayout>

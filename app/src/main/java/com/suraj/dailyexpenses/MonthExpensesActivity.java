@@ -3,10 +3,13 @@ package com.suraj.dailyexpenses;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -14,15 +17,23 @@ import android.widget.TextView;
 import com.suraj.dailyexpenses.data.BasicItem;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 
 public class MonthExpensesActivity extends AppCompatActivity implements InflationManager {
+    private boolean showInfrequent;
+
     private String monthNumber;
+
     private ArrayList<BasicItem> basicItems;
 
     private Spinner spinMonth;
+
     private TextView tvExpenditureForMonth;
+
     private ListView listViewExpensesDays;
+
+    private Button btnMonthlyDetailsMonthName;
 
     private static MonthExpensesActivity monthExpensesActivity;
 
@@ -32,21 +43,27 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
         setContentView(R.layout.activity_month_expenses);
 
         spinMonth = (Spinner) findViewById(R.id.spinMonths);
+
         tvExpenditureForMonth = (TextView) findViewById(R.id.tvExpenditureForMonth);
+
         listViewExpensesDays = (ListView) findViewById(R.id.lstViewDaysOfMonth);
 
-        ArrayList<String> monthList = Utils.getMonthsFromDatabase();
-        Collections.sort(monthList,Utils.monthComparator);
-        spinMonth.setAdapter(new ArrayAdapter<>(MonthExpensesActivity.this, android.R.layout.simple_spinner_dropdown_item, monthList));
-        tvExpenditureForMonth.setText(getResources().getString(R.string.expnditureMonth, Utils.getExpensesForMonth(Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString()))));
+        btnMonthlyDetailsMonthName = (Button) findViewById(R.id.btnMonthlyDetailsMonthName);
 
-        if (getIntent().getStringExtra(Utils.MONTH_NUMBER_INTENT_STRING) == null) {
+        showInfrequent = true;
+
+
+        ArrayList<String> monthList = Utils.getMonthsFromDatabase();
+        Collections.sort(monthList, Utils.monthComparator);
+        spinMonth.setAdapter(new ArrayAdapter<>(MonthExpensesActivity.this, android.R.layout.simple_spinner_dropdown_item, monthList));
+
+        if (monthList.size() > 0 && getIntent().getStringExtra(Utils.MONTH_NUMBER_INTENT_STRING) == null) {
             spinMonth.setSelection(monthList.size() - 1);
             monthNumber = "" + Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString());
-            basicItems = Utils.getDataForMonth(monthNumber);
-        } else {
+            basicItems = Utils.getDataForMonth(monthNumber, showInfrequent);
+        } else if (monthList.size() > 0) {
             monthNumber = getIntent().getStringExtra(Utils.MONTH_NUMBER_INTENT_STRING);
-            basicItems = Utils.getDataForMonth(monthNumber);
+            basicItems = Utils.getDataForMonth(monthNumber, showInfrequent);
 
             String monthName = Utils.getMonthNameFromNumber(Integer.parseInt(monthNumber));
 
@@ -62,7 +79,12 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
                 monthList.add(monthName);
                 spinMonth.setSelection(monthList.size() - 1);
             }
+        } else if (monthList.size() == 0) {
+            Calendar c = Calendar.getInstance();
+            monthList.add(Utils.getMonthNameFromNumber(c.get(Calendar.MONTH) + 1));
+            spinMonth.setAdapter(new ArrayAdapter<>(MonthExpensesActivity.this, android.R.layout.simple_spinner_dropdown_item, monthList));
         }
+        tvExpenditureForMonth.setText("" + Utils.getExpensesForMonth(Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString()), showInfrequent));
 
         updateListView();
 
@@ -88,12 +110,41 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
             }
         });
 
-        if(monthExpensesActivity!=null){
-            monthExpensesActivity.finish();
+        ensureSingleInstanceOnActivityStack();
+    }
+
+    private void ensureSingleInstanceOnActivityStack() {
+        if (MonthExpensesActivity.monthExpensesActivity != null) {
+            MonthExpensesActivity.monthExpensesActivity.finish();
         }
-        monthExpensesActivity=this;
+        MonthExpensesActivity.monthExpensesActivity = this;
+    }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_monthly_expenses, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.action_infrequents:
+                showInfrequent = !showInfrequent;
+                if (showInfrequent) {
+                    item.setTitle(getString(R.string.all));
+                    item.setIcon(null);
+                    Utils.showToast(getString(R.string.showingAllNotify));
+                } else {
+                    item.setIcon(R.drawable.ic_infrequents);
+                    Utils.showToast(getString(R.string.excludingInfrequentNotify));
+                }
+                updateListView();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -105,12 +156,12 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
 
     private void updateListView() {
         monthNumber = "" + Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString());
-        basicItems = Utils.getDataForMonth(monthNumber);
+        basicItems = Utils.getDataForMonth(monthNumber, showInfrequent);
         Collections.sort(basicItems, Utils.dateComparator);
 
         BasicItemsAdapter basicItemsAdapter = new BasicItemsAdapter(getApplicationContext(), basicItems, this);
         listViewExpensesDays.setAdapter(basicItemsAdapter);
-        tvExpenditureForMonth.setText(getResources().getString(R.string.expnditureMonth, Utils.getExpensesForMonth(Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString()))));
-
+        tvExpenditureForMonth.setText("" + Utils.getExpensesForMonth(Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString()), showInfrequent));
+        btnMonthlyDetailsMonthName.setText(spinMonth.getSelectedItem().toString());
     }
 }

@@ -3,11 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.suraj.dailyexpenses.ViewExpensesActivity">
 
-    <Spinner
+    <android.support.v7.widget.AppCompatSpinner
         android:id="@+id/spinDates"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,37 +15,74 @@
         android:paddingRight="@dimen/activity_vertical_margin"
         android:paddingStart="@dimen/activity_vertical_margin" />
 
-    <TextView
-        android:id="@+id/tvExpenditureForDate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/spinDates"
-        android:layout_margin="10dp"
-        android:text="@string/app_name" />
-
-    <TextView
-        android:id="@+id/tvExpenditureForCurrentMonth"
+    <FrameLayout
+        android:id="@+id/frameLayoutCurrentDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tvExpenditureForDate"
-        android:layout_margin="10dp"
-        android:text="@string/app_name" />
+        android:layout_below="@id/spinDates"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp">
 
-    <Button
-        android:id="@+id/btnViewForMonth"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        <Button
+            android:id="@+id/btnCurrentDate"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/ic_calendar_frame"
+            android:gravity="top|center"
+            android:padding="2dp"
+            android:text="May"
+            android:textColor="@android:color/white"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tvExpenditureForDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingTop="15dp"
+            android:text="may"
+            android:textColor="@android:color/black"
+            android:textSize="12sp" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/frameLayoutCurrentMonth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_alignTop="@id/tvExpenditureForCurrentMonth"
-        android:layout_marginRight="10dp"
-        android:background="@drawable/ic_calendar" />
+        android:layout_below="@id/spinDates"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp">
+
+        <Button
+            android:id="@+id/btnCurrentMonth"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/ic_calendar_frame"
+            android:gravity="top|center"
+            android:padding="2dp"
+            android:text="May"
+            android:textColor="@android:color/white"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tvExpenditureForCurrentMonth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingTop="15dp"
+            android:text="may"
+            android:textColor="@android:color/black"
+            android:textSize="12sp" />
+    </FrameLayout>
+
 
     <ListView
         android:id="@+id/lstViewItems"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tvExpenditureForCurrentMonth"
+        android:layout_below="@id/frameLayoutCurrentDate"
         android:layout_marginTop="10dp">
 
     </ListView>

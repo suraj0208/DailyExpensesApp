@@ -1,6 +1,8 @@
 package com.suraj.dailyexpenses;
 
 import android.Manifest;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -17,12 +19,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.suraj.dailyexpenses.data.Item;
+import com.suraj.dailyexpenses.data.BasicItem;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -30,12 +34,26 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
+
 public class ViewExpensesActivity extends AppCompatActivity implements InflationManager {
-    ArrayList<Item> items;
+    private int day;
+    private int month;
+    private int year;
+
+    private boolean first = true;
+
+    private ArrayList<BasicItem> items;
 
     private Spinner spinDates;
+
     private TextView tvExpenditureForDate;
     private TextView tvExpenditureForMonth;
+
+    private Button btnCurrentDate;
+    private Button btnCurrentMonth;
+
     private ListView listView;
 
     private static ViewExpensesActivity viewExpensesActivity;
@@ -48,6 +66,9 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
         spinDates = (Spinner) findViewById(R.id.spinDates);
         tvExpenditureForDate = (TextView) findViewById(R.id.tvExpenditureForDate);
         tvExpenditureForMonth = (TextView) findViewById(R.id.tvExpenditureForCurrentMonth);
+
+        btnCurrentDate = (Button) findViewById(R.id.btnCurrentDate);
+        btnCurrentMonth = (Button) findViewById(R.id.btnCurrentMonth);
 
         listView = (ListView) findViewById(R.id.lstViewItems);
 
@@ -89,6 +110,11 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
                 String date = spinDates.getSelectedItem().toString();
                 items = Utils.getItemsForDate(date);
 
+                if (first) {
+                    first = false;
+                    return;
+                }
+
                 updateListView();
             }
 
@@ -127,7 +153,7 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
             }
         });
 
-        findViewById(R.id.btnViewForMonth).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btnCurrentMonth).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(ViewExpensesActivity.this, MonthExpensesActivity.class);
@@ -137,11 +163,73 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
             }
         });
 
-        if (viewExpensesActivity != null) {
-            viewExpensesActivity.finish();
-        }
-        viewExpensesActivity = this;
+        findViewById(R.id.btnCurrentDate).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(ViewExpensesActivity.this, MainActivity.class));
+                ViewExpensesActivity.this.finish();
+            }
+        });
 
+        ensureSingleInstanceOnActivityStack();
+
+        showTips();
+        requestSelfPermission();
+
+    }
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        if (id == 999) {
+            return new DatePickerDialog(this,
+                    myDateListener, year, month, day);
+        }
+        return null;
+    }
+
+    private DatePickerDialog.OnDateSetListener myDateListener = new
+            DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker arg0,
+                                      int year, int month, int day) {
+
+                }
+            };
+
+
+    private void ensureSingleInstanceOnActivityStack() {
+        if (ViewExpensesActivity.viewExpensesActivity != null) {
+            ViewExpensesActivity.viewExpensesActivity.finish();
+        }
+        ViewExpensesActivity.viewExpensesActivity = this;
+    }
+
+    private void showTips() {
+        if (listView.getAdapter().getCount() > 0) {
+
+            MaterialShowcaseView materialShowcaseViewSingleClick = new MaterialShowcaseView.Builder(this)
+                    .setTarget(findViewById(R.id.lstViewItems))
+                    .setDismissText(R.string.tipOk)
+                    .setContentText(R.string.tipListViewSingleClick)
+                    .setDismissOnTargetTouch(true)
+                    .setDismissOnTouch(true)
+                    .withRectangleShape()
+                    .build();
+
+            MaterialShowcaseView materialShowcaseViewLongPress = new MaterialShowcaseView.Builder(this)
+                    .setTarget(findViewById(R.id.lstViewItems))
+                    .setDismissText(R.string.tipGotIt)
+                    .setContentText(R.string.tipListViewLongPress)
+                    .setDismissOnTargetTouch(true)
+                    .setDismissOnTouch(true)
+                    .withRectangleShape()
+                    .build();
+
+
+            MaterialShowcaseSequence sequence = Utils.getMaterialShowcaseSequence(this, Utils.VIEW_EXPENSES_ACTIVITY_TIPS, new MaterialShowcaseView[]{materialShowcaseViewSingleClick, materialShowcaseViewLongPress});
+            if (sequence != null)
+                sequence.start();
+        }
     }
 
     @Override
@@ -182,7 +270,7 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
                                     bufferedWriter.write("Amount ( Rs )");
                                     bufferedWriter.write("\n");
 
-                                    for (Item item : items) {
+                                    for (BasicItem item : items) {
                                         bufferedWriter.write(item.getReason());
                                         bufferedWriter.write(",");
                                         bufferedWriter.write("" + item.getAmount());
@@ -191,11 +279,11 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
 
                                     bufferedWriter.close();
                                     fileWriter.close();
+                                    Utils.showToast(getString(R.string.exportSuccessfulNotify));
 
                                 } catch (Exception ex) {
                                     ex.printStackTrace();
                                 }
-
                             }
                         })
                         .setNegativeButton(getResources().getString(R.string.cancel), null)
@@ -207,9 +295,9 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
                 Calendar calendar = Calendar.getInstance();
 
                 String date = Utils.getDayOfWeekString(calendar.get(Calendar.DAY_OF_WEEK))
-                        + " " + calendar.get(Calendar.DAY_OF_MONTH) + "-" + (calendar.get(Calendar.MONTH)+ 1) + "-" + calendar.get(Calendar.YEAR);
+                        + " " + calendar.get(Calendar.DAY_OF_MONTH) + "-" + (calendar.get(Calendar.MONTH) + 1) + "-" + calendar.get(Calendar.YEAR);
 
-                date+="-all";
+                date += "-all";
 
                 getInputDialogBuilder(date + ".csv")
                         .setTitle(getResources().getString(R.string.enterFileName))
@@ -240,12 +328,12 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
                                     bufferedWriter.write("Amount ( Rs )");
                                     bufferedWriter.write("\n");
 
-                                    String prevDate=null;
+                                    String prevDate = null;
 
-                                    for (Item item : Utils.getAllItemsFromDatabase()) {
-                                        if(!item.getDate().equals(prevDate)){
+                                    for (BasicItem item : Utils.getAllItemsFromDatabase()) {
+                                        if (!item.getDate().equals(prevDate)) {
                                             bufferedWriter.write(item.getDate());
-                                        }else{
+                                        } else {
                                             bufferedWriter.write("");
                                         }
                                         bufferedWriter.write(",");
@@ -253,11 +341,13 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
                                         bufferedWriter.write(",");
                                         bufferedWriter.write("" + item.getAmount());
                                         bufferedWriter.write("\n");
-                                        prevDate=item.getDate();
+                                        prevDate = item.getDate();
                                     }
 
                                     bufferedWriter.close();
                                     fileWriter.close();
+                                    Utils.showToast(getString(R.string.exportSuccessfulNotify));
+
 
                                 } catch (Exception ex) {
                                     ex.printStackTrace();
@@ -267,6 +357,16 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
                         })
                         .setNegativeButton(getResources().getString(R.string.cancel), null)
                         .show();
+
+            case R.id.action_backup:
+                requestSelfPermission();
+                Utils.backup();
+                break;
+
+            case R.id.action_restore:
+                requestSelfPermission();
+                Utils.restore(true);
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -296,18 +396,24 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
 
     private void updateListView() {
         String date = spinDates.getSelectedItem().toString();
-        listView.setAdapter(new ItemsAdapter(getApplicationContext(), items, this));
-        tvExpenditureForDate.setText(getResources().getString(R.string.expnditureDay, Utils.getExpenditureForDate(date)));
-        tvExpenditureForMonth.setText(getResources().getString(R.string.expnditureMonth, Utils.getExpensesForMonth(Integer.parseInt(date.split("/")[1]))));
+        listView.setAdapter(new BasicItemsAdapter(getApplicationContext(), items, this));
+        tvExpenditureForDate.setText("" + Utils.getExpenditureForDate(date, true));
+        tvExpenditureForMonth.setText("" + Utils.getExpensesForMonth(Integer.parseInt(date.split("/")[1]), true));
+
+        btnCurrentDate.setText(date.substring(date.indexOf(" "), date.lastIndexOf("/")).trim());
+        btnCurrentMonth.setText(Utils.getMonthNameFromNumber(Integer.parseInt(date.split("/")[1])));
+
     }
+
 
     @Override
     public void onGetView(int position, View rowView, ViewGroup parent) {
 
-        Item item = items.get(position);
+        BasicItem item = items.get(position);
 
         ((TextView) rowView.findViewById(R.id.tvItemName)).setText(item.getReason());
         ((TextView) rowView.findViewById(R.id.tvItemAmount)).setText(getResources().getString(R.string.rs, item.getAmount()));
+
     }
 
     public void requestSelfPermission() {

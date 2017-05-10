@@ -1,7 +1,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.MainActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/action_exportSpecific"
@@ -15,5 +13,16 @@
         android:title="@string/exportDatabase"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_backup"
+        android:orderInCategory="100"
+        android:title="Backup"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_restore"
+        android:orderInCategory="100"
+        android:title="Restore"
+        app:showAsAction="never" />
 
 </menu>

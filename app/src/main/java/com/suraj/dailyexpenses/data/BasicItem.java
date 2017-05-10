@@ -1,17 +1,37 @@
 package com.suraj.dailyexpenses.data;
 
-import java.io.Serializable;
+
+import io.realm.RealmObject;
 
 /**
  * Created by suraj on 1/5/17.
  */
-public class BasicItem implements Serializable{
+public class BasicItem extends RealmObject{
     private String date;
     private String dayName;
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    private String reason;
     private int day;
     private int month;
     private int year;
 
+    public boolean isInFrequent() {
+        return inFrequent;
+    }
+
+    public void setInFrequent(boolean inFrequent) {
+        this.inFrequent = inFrequent;
+    }
+
+    private boolean inFrequent;
 
     public String getDayName() {
         return dayName;
