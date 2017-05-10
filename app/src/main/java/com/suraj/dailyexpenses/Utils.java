@@ -43,7 +43,8 @@ import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
  */
 public class Utils {
     public static final String MAIN_ACTIVITY_TIPS = "v2MainActivityTips";
-    public static final String VIEW_EXPENSES_ACTIVITY_TIPS = "v2ViewExpensesActivityTips";
+    public static final String VIEW_EXPENSES_ACTIVITY_BUTTON_TIPS = "v3ViewExpensesActivityButtonTips";
+    public static final String VIEW_EXPENSES_ACTIVITY_LISTVIEW_TIPS = "v3ViewExpensesActivityListViewTips";
 
     public static final String MONTH_NUMBER_INTENT_STRING = "monthNumber";
     public static final String DATE_INTENT_STRING = "date";
@@ -296,7 +297,7 @@ public class Utils {
         return stringStringHashMap.get(monthName);
     }
 
-    public static ArrayList<BasicItem> getDataForMonth(String month, boolean showInfrequent) {
+    public static ArrayList<BasicItem> getDataForMonth(int month, boolean showInfrequent) {
         RealmQuery<BasicItem> itemRealmQuery = realm.where(BasicItem.class);
         RealmResults<BasicItem> realmResults = itemRealmQuery.findAll();
 
@@ -309,9 +310,8 @@ public class Utils {
 
             String date = basicItem.getDate();
 
-            String currentMonth = date.split("/")[1];
 
-            if (currentMonth.equals(month)) {
+            if (basicItem.getMonth()==month) {
                 Integer current = monthExpensesTreeMap.get(date);
                 if (current == null) {
                     monthExpensesTreeMap.put(date, basicItem.getAmount());

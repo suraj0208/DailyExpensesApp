@@ -51,15 +51,20 @@
 
     <string name="tipSetDate">Select date</string>
     <string name="tipCommonItems">Quickly add common items</string>
-    <string name="tipadjustAndSave">Easily adjust amount and save</string>
+    <string name="tipAdjustAndSave">Easily adjust amount and save</string>
     <string name="tipOk">Okay!</string>
     <string name="tipGotIt">Got It</string>
     <string name="tipStart">Lets Start</string>
     <string name="tipViewForMonth">View details of current month</string>
     <string name="tipListViewSingleClick">Click to view details of item</string>
     <string name="tipListViewLongPress">Long press to delete item</string>
+    <string name="tipMonthClick">Click to view details of month</string>
+
+
     <string name="infrequentItem">Infrequent</string>
+
     <string name="all">All</string>
+
     <string name="showingAllNotify">Showing all items</string>
     <string name="excludingInfrequentNotify">Excluding infrequent items</string>
 
@@ -68,6 +73,8 @@
 
     <string name="exportSuccessfulNotify">Successfully Exported</string>
     <string name="backupNotFoundNotify">No recent backup found</string>
+
+    <string name="expenseItem">on %1$s</string>
 
 
 </resources>

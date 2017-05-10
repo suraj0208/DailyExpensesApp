@@ -23,7 +23,7 @@ import java.util.Collections;
 public class MonthExpensesActivity extends AppCompatActivity implements InflationManager {
     private boolean showInfrequent;
 
-    private String monthNumber;
+    private int monthNumber;
 
     private ArrayList<BasicItem> basicItems;
 
@@ -52,20 +52,21 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
 
         showInfrequent = true;
 
+        (findViewById(R.id.tvExpenseItemName)).setVisibility(View.GONE);
 
         ArrayList<String> monthList = Utils.getMonthsFromDatabase();
         Collections.sort(monthList, Utils.monthComparator);
         spinMonth.setAdapter(new ArrayAdapter<>(MonthExpensesActivity.this, android.R.layout.simple_spinner_dropdown_item, monthList));
 
-        if (monthList.size() > 0 && getIntent().getStringExtra(Utils.MONTH_NUMBER_INTENT_STRING) == null) {
+        if (monthList.size() > 0 && getIntent().getIntExtra(Utils.MONTH_NUMBER_INTENT_STRING,-1) == -1) {
             spinMonth.setSelection(monthList.size() - 1);
-            monthNumber = "" + Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString());
+            monthNumber = Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString());
             basicItems = Utils.getDataForMonth(monthNumber, showInfrequent);
         } else if (monthList.size() > 0) {
-            monthNumber = getIntent().getStringExtra(Utils.MONTH_NUMBER_INTENT_STRING);
+            monthNumber = getIntent().getIntExtra(Utils.MONTH_NUMBER_INTENT_STRING,-1);
             basicItems = Utils.getDataForMonth(monthNumber, showInfrequent);
 
-            String monthName = Utils.getMonthNameFromNumber(Integer.parseInt(monthNumber));
+            String monthName = Utils.getMonthNameFromNumber(monthNumber);
 
             int i;
             for (i = 0; i < monthList.size(); i++) {
@@ -155,7 +156,7 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
     }
 
     private void updateListView() {
-        monthNumber = "" + Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString());
+        monthNumber = Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString());
         basicItems = Utils.getDataForMonth(monthNumber, showInfrequent);
         Collections.sort(basicItems, Utils.dateComparator);
 

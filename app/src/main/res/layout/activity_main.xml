@@ -17,17 +17,39 @@
         android:paddingTop="@dimen/activity_vertical_margin"
         android:text="@string/setDate" />
 
-    <android.support.v7.widget.AppCompatButton
-        android:id="@+id/btnSetDate"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+    <FrameLayout
+        android:id="@+id/frameLayoutCurrentDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/tvDate"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_marginBottom="10dp"
-        android:background="@drawable/ic_calendar" />
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin">
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/btnSetDate"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/ic_pick_date"
+            android:gravity="top|center"
+            android:padding="2dp"
+            android:text="May"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/picker_icon_text_size" />
+
+        <TextView
+            android:id="@+id/tvPickDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingTop="12dp"
+            android:text="may"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/picker_textview_icon_text_size" />
+    </FrameLayout>
+
 
     <CheckBox
         android:id="@+id/chkboxInfrequent"

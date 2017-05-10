@@ -6,24 +6,15 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.suraj.dailyexpenses.ViewExpensesActivity">
 
-    <android.support.v7.widget.AppCompatSpinner
-        android:id="@+id/spinDates"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingEnd="@dimen/activity_vertical_margin"
-        android:paddingLeft="@dimen/activity_vertical_margin"
-        android:paddingRight="@dimen/activity_vertical_margin"
-        android:paddingStart="@dimen/activity_vertical_margin" />
 
     <FrameLayout
         android:id="@+id/frameLayoutCurrentDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/spinDates"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp">
 
-        <Button
+        <android.support.v7.widget.AppCompatButton
             android:id="@+id/btnCurrentDate"
             android:layout_width="50dp"
             android:layout_height="50dp"
@@ -32,7 +23,7 @@
             android:padding="2dp"
             android:text="May"
             android:textColor="@android:color/white"
-            android:textSize="14sp" />
+            android:textSize="@dimen/icon_text_size" />
 
         <TextView
             android:id="@+id/tvExpenditureForDate"
@@ -42,7 +33,7 @@
             android:paddingTop="15dp"
             android:text="may"
             android:textColor="@android:color/black"
-            android:textSize="12sp" />
+            android:textSize="@dimen/textview_icon_text_size" />
     </FrameLayout>
 
     <FrameLayout
@@ -51,11 +42,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@id/spinDates"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp">
 
-        <Button
+        <android.support.v7.widget.AppCompatButton
             android:id="@+id/btnCurrentMonth"
             android:layout_width="50dp"
             android:layout_height="50dp"
@@ -64,7 +54,7 @@
             android:padding="2dp"
             android:text="May"
             android:textColor="@android:color/white"
-            android:textSize="14sp" />
+            android:textSize="@dimen/icon_text_size" />
 
         <TextView
             android:id="@+id/tvExpenditureForCurrentMonth"
@@ -74,7 +64,7 @@
             android:paddingTop="15dp"
             android:text="may"
             android:textColor="@android:color/black"
-            android:textSize="12sp" />
+            android:textSize="@dimen/textview_icon_text_size" />
     </FrameLayout>
 
 

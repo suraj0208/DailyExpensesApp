@@ -1,5 +1,6 @@
 package com.suraj.dailyexpenses;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -34,6 +35,7 @@ public class MonthlyItemActivity extends AppCompatActivity {
     private View frameLayoutMonthlyDetails;
 
     private TextView textView;
+    private TextView tvExpenseItemName;
 
     private Button btnMonthlyDetailsMonthName;
     private Button btnItemDetails;
@@ -42,7 +44,8 @@ public class MonthlyItemActivity extends AppCompatActivity {
 
     private ListView listView;
 
-    private AdapterView.OnItemClickListener onItemClickListener;
+    private AdapterView.OnItemClickListener onItemClickListenerMonthDetails;
+    private AdapterView.OnItemClickListener onItemClickListenerOpenDay;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,21 +56,24 @@ public class MonthlyItemActivity extends AppCompatActivity {
         if (itemName == null)
             finish();
 
-        spinMonths = (Spinner) findViewById(R.id.spinMonths);
+        frameLayoutItemDetails = findViewById(R.id.frameLayoutItemDetails);
+        frameLayoutMonthlyDetails = findViewById(R.id.frameLayoutMonthlyDetails);
+
+        textView = (TextView) findViewById(R.id.tvExpenditureForMonth);
+        tvExpenseItemName = (TextView)findViewById(R.id.tvExpenseItemName);
+
         btnMonthlyDetailsMonthName = (Button) findViewById(R.id.btnMonthlyDetailsMonthName);
         btnItemDetails = (Button) findViewById(R.id.btnItemDetails);
 
-        frameLayoutItemDetails = findViewById(R.id.frameLayoutItemDetails);
-        frameLayoutMonthlyDetails = findViewById(R.id.frameLayoutMonthlyDetails);
+        spinMonths = (Spinner) findViewById(R.id.spinMonths);
+
+        listView = (ListView) findViewById(R.id.lstViewDaysOfMonth);
 
         monthList = Utils.getMonthsFromDatabase();
         Collections.sort(monthList, Utils.monthComparator);
         spinMonths.setAdapter(new ArrayAdapter<>(MonthlyItemActivity.this, android.R.layout.simple_spinner_dropdown_item, monthList));
 
-        listView = (ListView) findViewById(R.id.lstViewDaysOfMonth);
-        textView = (TextView) findViewById(R.id.tvExpenditureForMonth);
-
-        onItemClickListener = new AdapterView.OnItemClickListener() {
+        onItemClickListenerMonthDetails = new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
@@ -84,6 +90,15 @@ public class MonthlyItemActivity extends AppCompatActivity {
 
                 }
                 updateUIForMonth();
+            }
+        };
+
+        onItemClickListenerOpenDay = new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(MonthlyItemActivity.this,ViewExpensesActivity.class);
+                intent.putExtra(Utils.DATE_INTENT_STRING,basicItemList.get(i).getDate());
+                startActivity(intent);
             }
         };
 
@@ -114,7 +129,7 @@ public class MonthlyItemActivity extends AppCompatActivity {
 
         listView.setAdapter(new BasicItemsAdapter(getApplicationContext(), bakMonthItemList, new AllMonthsInflationManager(bakMonthItemList)));
 
-        listView.setOnItemClickListener(onItemClickListener);
+        listView.setOnItemClickListener(onItemClickListenerMonthDetails);
 
         frameLayoutItemDetails.setVisibility(View.VISIBLE);
         frameLayoutMonthlyDetails.setVisibility(View.GONE);
@@ -123,6 +138,8 @@ public class MonthlyItemActivity extends AppCompatActivity {
         layoutParams.addRule(RelativeLayout.BELOW,R.id.frameLayoutItemDetails);
         layoutParams.setMargins(0,10,0,0);
         listView.setLayoutParams(layoutParams);
+
+        tvExpenseItemName.setVisibility(View.INVISIBLE);
 
         btnItemDetails.setText(getString(R.string.expnditureForItem,itemName,Utils.getSum(bakMonthItemList)));
     }
@@ -136,7 +153,7 @@ public class MonthlyItemActivity extends AppCompatActivity {
         listView.setAdapter(new BasicItemsAdapter(getApplicationContext(), basicItemList, new MonthInflationManager(basicItemList)));
         textView.setText("" + Utils.getSum(basicItemList));
 
-        listView.setOnItemClickListener(null);
+        listView.setOnItemClickListener(onItemClickListenerOpenDay);
 
         frameLayoutItemDetails.setVisibility(View.INVISIBLE);
         frameLayoutMonthlyDetails.setVisibility(View.VISIBLE);
@@ -147,6 +164,9 @@ public class MonthlyItemActivity extends AppCompatActivity {
         layoutParams.addRule(RelativeLayout.BELOW,R.id.frameLayoutMonthlyDetails);
         layoutParams.setMargins(0,10,0,0);
         listView.setLayoutParams(layoutParams);
+
+        tvExpenseItemName.setVisibility(View.VISIBLE);
+        tvExpenseItemName.setText(getString(R.string.expenseItem, itemName));
 
     }
 

@@ -33,6 +33,9 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView tvDate;
     private TextView tvTodayExpenditure;
+    private TextView tvPickDate;
+
+    private Button btnSetDate;
 
     private EditText etSpendReason;
     private EditText etSpentAmount;
@@ -50,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
         tvDate = (TextView) findViewById(R.id.tvDate);
         tvTodayExpenditure = (TextView) findViewById(R.id.tvTodaysExpenditure);
+        tvPickDate = (TextView)findViewById(R.id.tvPickDate);
 
         etSpendReason = (EditText) findViewById(R.id.etSpendReason);
         etSpentAmount = (EditText) findViewById(R.id.etSpentAmount);
@@ -61,7 +65,8 @@ public class MainActivity extends AppCompatActivity {
         initSaveButton();
         initViewButtons();
 
-        (findViewById(R.id.btnSetDate)).setOnClickListener(new View.OnClickListener() {
+        btnSetDate = (Button)findViewById(R.id.btnSetDate);
+        btnSetDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showDialog(999);
@@ -74,7 +79,9 @@ public class MainActivity extends AppCompatActivity {
         month = calendar.get(Calendar.MONTH);
         day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        showDate(calendar.get(Calendar.DAY_OF_WEEK), year, month + 1, day);
+        initPickerViews(day,month);
+
+        showDateOnTextView(calendar.get(Calendar.DAY_OF_WEEK), year, month + 1, day);
 
         Utils.initRealm(getApplicationContext());
         showTodayExpenditure();
@@ -98,6 +105,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void initPickerViews(int day,int month) {
+        tvPickDate.setText(""+day);
+        btnSetDate.setText(Utils.getMonthNameFromNumber(month+1));
+    }
+
     private void ensureSingleInstanceOnActivityStack() {
         if(MainActivity.mainActivity!=null){
             MainActivity.mainActivity.finish();
@@ -111,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
 
         MaterialShowcaseView materialShowcaseViewCommonItems = buildRectangularMaterialShowcaseView(findViewById(R.id.hzScrollViewReasons), getString(R.string.tipGotIt), getString(R.string.tipCommonItems), true);
 
-        MaterialShowcaseView materialShowcaseViewAdjust = buildRectangularMaterialShowcaseView(findViewById(R.id.llPlusMinusButtons), getString(R.string.tipStart), getString(R.string.tipadjustAndSave), false);
+        MaterialShowcaseView materialShowcaseViewAdjust = buildRectangularMaterialShowcaseView(findViewById(R.id.llPlusMinusButtons), getString(R.string.tipStart), getString(R.string.tipAdjustAndSave), false);
 
         ShowcaseConfig config = new ShowcaseConfig();
         config.setDelay(100);
@@ -170,12 +182,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showTodayExpenditure() {
-        //Calendar calendar = Calendar.getInstance();
-        //calendar.set(year, month, day);
-        //int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-
-        //showDate(dayOfWeek, year, month + 1, day);
-
         tvTodayExpenditure.setText(getResources().getString(R.string.todaysExpenditure, Utils.getExpenditureForDate(tvDate.getText().toString(), true)));
     }
 
@@ -331,12 +337,13 @@ public class MainActivity extends AppCompatActivity {
                     Calendar calendar = Calendar.getInstance();
                     calendar.set(year, month, day);
                     int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-                    showDate(dayOfWeek, year, month + 1, day);
+                    initPickerViews(day,month);
+                    showDateOnTextView(dayOfWeek, year, month + 1, day);
                     showTodayExpenditure();
                 }
             };
 
-    private void showDate(int dayOfWeek, int year, int month, int day) {
+    private void showDateOnTextView(int dayOfWeek, int year, int month, int day) {
         tvDate.setText(new StringBuilder().append(Utils.getDayOfWeekString(dayOfWeek)).append(" ").append(day).append("/")
                 .append(month).append("/").append(year));
     }

@@ -18,12 +18,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.suraj.dailyexpenses.data.BasicItem;
@@ -34,19 +32,20 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import uk.co.deanwild.materialshowcaseview.IShowcaseListener;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
 public class ViewExpensesActivity extends AppCompatActivity implements InflationManager {
+
+    private int dayOfWeek;
     private int day;
     private int month;
     private int year;
 
-    private boolean first = true;
+    private String date;
 
     private ArrayList<BasicItem> items;
-
-    private Spinner spinDates;
 
     private TextView tvExpenditureForDate;
     private TextView tvExpenditureForMonth;
@@ -63,7 +62,7 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_expenses);
 
-        spinDates = (Spinner) findViewById(R.id.spinDates);
+
         tvExpenditureForDate = (TextView) findViewById(R.id.tvExpenditureForDate);
         tvExpenditureForMonth = (TextView) findViewById(R.id.tvExpenditureForCurrentMonth);
 
@@ -72,61 +71,32 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
 
         listView = (ListView) findViewById(R.id.lstViewItems);
 
-        ArrayList<String> dates = Utils.getAllDatesInDatabase();
-
-        spinDates.setAdapter(new ArrayAdapter<>(ViewExpensesActivity.this, android.R.layout.simple_spinner_dropdown_item, dates));
-
-        String date;
+        Calendar calendar = Calendar.getInstance();
 
         if (getIntent().getStringExtra(Utils.DATE_INTENT_STRING) == null) {
-            spinDates.setSelection(dates.size() - 1);
-            date = spinDates.getSelectedItem().toString();
+            day = calendar.get(Calendar.DAY_OF_MONTH);
+            month = calendar.get(Calendar.MONTH) + 1;
+            year = calendar.get(Calendar.YEAR);
         } else {
             date = getIntent().getStringExtra(Utils.DATE_INTENT_STRING);
-            int i;
+            String[] splits = date.split("/");
 
-            for (i = 0; i < dates.size(); i++) {
-                if (dates.get(i).equals(date)) {
-                    spinDates.setSelection(i);
-                    break;
-                }
-            }
+            day = Integer.parseInt(splits[0].split(" ")[1]);
+            month = Integer.parseInt(splits[1]);
+            year = Integer.parseInt(splits[2]);
 
-            if (i == dates.size()) {
-                dates.add(date);
-                spinDates.setAdapter(new ArrayAdapter<>(ViewExpensesActivity.this, android.R.layout.simple_spinner_dropdown_item, dates));
-                spinDates.setSelection(dates.size() - 1);
-                date = spinDates.getSelectedItem().toString();
-            }
+            calendar.set(year, month - 1, day);
+
+            dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
         }
 
-        items = Utils.getItemsForDate(date);
+        setDateString();
 
         updateListView();
-
-        spinDates.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                String date = spinDates.getSelectedItem().toString();
-                items = Utils.getItemsForDate(date);
-
-                if (first) {
-                    first = false;
-                    return;
-                }
-
-                updateListView();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-            }
-        });
 
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int i, long l) {
-
                 new AlertDialog.Builder(ViewExpensesActivity.this)
                         .setTitle("Sure?")
                         .setMessage("Delete selected item?")
@@ -157,8 +127,7 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(ViewExpensesActivity.this, MonthExpensesActivity.class);
-
-                intent.putExtra(Utils.MONTH_NUMBER_INTENT_STRING, spinDates.getSelectedItem().toString().split("/")[1]);
+                intent.putExtra(Utils.MONTH_NUMBER_INTENT_STRING, month);
                 startActivity(intent);
             }
         });
@@ -166,23 +135,29 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
         findViewById(R.id.btnCurrentDate).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(ViewExpensesActivity.this, MainActivity.class));
-                ViewExpensesActivity.this.finish();
+                showDialog(999);
             }
         });
 
         ensureSingleInstanceOnActivityStack();
 
-        showTips();
+        showTipsForButtons();
         requestSelfPermission();
 
+    }
+
+
+
+
+    private void setDateString() {
+        date = Utils.getDayOfWeekString(dayOfWeek) + " " + day + "/" + month + "/" + year;
     }
 
     @Override
     protected Dialog onCreateDialog(int id) {
         if (id == 999) {
             return new DatePickerDialog(this,
-                    myDateListener, year, month, day);
+                    myDateListener, year, month - 1, day);
         }
         return null;
     }
@@ -192,7 +167,17 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
                 @Override
                 public void onDateSet(DatePicker arg0,
                                       int year, int month, int day) {
+                    ViewExpensesActivity.this.day = day;
+                    ViewExpensesActivity.this.month = month + 1;
+                    ViewExpensesActivity.this.year = year;
 
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(year, month, day);
+
+                    ViewExpensesActivity.this.dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+
+                    setDateString();
+                    updateListView();
                 }
             };
 
@@ -204,31 +189,80 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
         ViewExpensesActivity.viewExpensesActivity = this;
     }
 
-    private void showTips() {
+    private void showTipsForButtons() {
+        MaterialShowcaseView materialShowcaseSelectDate = new MaterialShowcaseView.Builder(this)
+                .setTarget(findViewById(R.id.btnCurrentDate))
+                .setDismissText(R.string.tipOk)
+                .setContentText(R.string.tipSetDate)
+                .setDismissOnTargetTouch(true)
+                .setDismissOnTouch(true)
+                .withRectangleShape()
+                .build();
+
+        MaterialShowcaseView materialShowcaseViewClickMonth = new MaterialShowcaseView.Builder(this)
+                .setTarget(findViewById(R.id.btnCurrentMonth))
+                .setDismissText(R.string.tipOk)
+                .setContentText(R.string.tipMonthClick)
+                .setDismissOnTargetTouch(true)
+                .setDismissOnTouch(true)
+                .setListener(new IShowcaseListener() {
+                    @Override
+                    public void onShowcaseDisplayed(MaterialShowcaseView materialShowcaseView) {
+
+                    }
+
+                    @Override
+                    public void onShowcaseDismissed(MaterialShowcaseView materialShowcaseView) {
+                        showTipsForListView();
+                    }
+                })
+                .withRectangleShape()
+                .build();
+
+
+        MaterialShowcaseSequence sequence;
+
+        sequence = Utils.getMaterialShowcaseSequence(this, Utils.VIEW_EXPENSES_ACTIVITY_BUTTON_TIPS, new MaterialShowcaseView[]{materialShowcaseSelectDate,materialShowcaseViewClickMonth});
+
+        if (sequence != null) {
+            sequence.start();
+
+            if(sequence.hasFired())
+                showTipsForListView();
+
+        }
+
+
+    }
+
+    private void showTipsForListView() {
+
+        MaterialShowcaseSequence sequence;
+
+        MaterialShowcaseView materialShowcaseViewSingleClick = new MaterialShowcaseView.Builder(this)
+                .setTarget(findViewById(R.id.lstViewItems))
+                .setDismissText(R.string.tipOk)
+                .setContentText(R.string.tipListViewSingleClick)
+                .setDismissOnTargetTouch(true)
+                .setDismissOnTouch(true)
+                .withRectangleShape()
+                .build();
+
+        MaterialShowcaseView materialShowcaseViewLongPress = new MaterialShowcaseView.Builder(this)
+                .setTarget(findViewById(R.id.lstViewItems))
+                .setDismissText(R.string.tipGotIt)
+                .setContentText(R.string.tipListViewLongPress)
+                .setDismissOnTargetTouch(true)
+                .setDismissOnTouch(true)
+                .withRectangleShape()
+                .build();
+
         if (listView.getAdapter().getCount() > 0) {
+            sequence = Utils.getMaterialShowcaseSequence(this, Utils.VIEW_EXPENSES_ACTIVITY_LISTVIEW_TIPS, new MaterialShowcaseView[]{materialShowcaseViewSingleClick,materialShowcaseViewLongPress});
 
-            MaterialShowcaseView materialShowcaseViewSingleClick = new MaterialShowcaseView.Builder(this)
-                    .setTarget(findViewById(R.id.lstViewItems))
-                    .setDismissText(R.string.tipOk)
-                    .setContentText(R.string.tipListViewSingleClick)
-                    .setDismissOnTargetTouch(true)
-                    .setDismissOnTouch(true)
-                    .withRectangleShape()
-                    .build();
-
-            MaterialShowcaseView materialShowcaseViewLongPress = new MaterialShowcaseView.Builder(this)
-                    .setTarget(findViewById(R.id.lstViewItems))
-                    .setDismissText(R.string.tipGotIt)
-                    .setContentText(R.string.tipListViewLongPress)
-                    .setDismissOnTargetTouch(true)
-                    .setDismissOnTouch(true)
-                    .withRectangleShape()
-                    .build();
-
-
-            MaterialShowcaseSequence sequence = Utils.getMaterialShowcaseSequence(this, Utils.VIEW_EXPENSES_ACTIVITY_TIPS, new MaterialShowcaseView[]{materialShowcaseViewSingleClick, materialShowcaseViewLongPress});
             if (sequence != null)
                 sequence.start();
+
         }
     }
 
@@ -245,7 +279,7 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
         switch (id) {
             case R.id.action_exportSpecific:
 
-                getInputDialogBuilder((spinDates.getSelectedItem().toString() + ".csv").replaceAll("/", "-"))
+                getInputDialogBuilder((date + ".csv").replaceAll("/", "-"))
                         .setTitle(getResources().getString(R.string.enterFileName))
                         .setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
                             @Override
@@ -395,12 +429,12 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
     }
 
     private void updateListView() {
-        String date = spinDates.getSelectedItem().toString();
+        items = Utils.getItemsForDate(date);
         listView.setAdapter(new BasicItemsAdapter(getApplicationContext(), items, this));
         tvExpenditureForDate.setText("" + Utils.getExpenditureForDate(date, true));
         tvExpenditureForMonth.setText("" + Utils.getExpensesForMonth(Integer.parseInt(date.split("/")[1]), true));
 
-        btnCurrentDate.setText(date.substring(date.indexOf(" "), date.lastIndexOf("/")).trim());
+        btnCurrentDate.setText(day + "/" + month);
         btnCurrentMonth.setText(Utils.getMonthNameFromNumber(Integer.parseInt(date.split("/")[1])));
 
     }
