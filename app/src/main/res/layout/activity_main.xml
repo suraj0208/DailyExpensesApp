@@ -103,7 +103,7 @@
                     android:layout_centerHorizontal="true"
                     android:layout_marginEnd="20dp"
                     android:layout_marginRight="20dp"
-                    android:background="@drawable/ic_breakfast" />
+                    android:background="@drawable/ic_breakfast"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -227,42 +227,42 @@
                 android:id="@+id/btn10"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#00000000"
+                android:background="?android:attr/selectableItemBackground"
                 android:text="@string/string10" />
 
             <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btn20"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#00000000"
+                android:background="?android:attr/selectableItemBackground"
                 android:text="@string/string20" />
 
             <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btn30"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#00000000"
+                android:background="?android:attr/selectableItemBackground"
                 android:text="@string/string30" />
 
             <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btn40"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#00000000"
+                android:background="?android:attr/selectableItemBackground"
                 android:text="@string/string40" />
 
             <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btn50"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#00000000"
+                android:background="?android:attr/selectableItemBackground"
                 android:text="@string/string50" />
 
             <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btn100"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#00000000"
+                android:background="?android:attr/selectableItemBackground"
                 android:text="@string/string100" />
         </LinearLayout>
     </HorizontalScrollView>
@@ -293,6 +293,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:layout_marginRight="@dimen/activity_horizontal_margin">
+
 
             <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btnAmountPlus"
@@ -339,17 +340,25 @@
             android:layout_height="wrap_content"
             android:layout_weight="1">
 
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/btnViewMonth"
+            <FrameLayout
+                android:id="@+id/frameLayputbtnViewMonth"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_centerHorizontal="true"
-                android:background="@drawable/ic_view_month" />
+                android:background="@drawable/ic_view_month">
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/btnViewMonth"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="?android:attr/selectableItemBackground" />
+
+            </FrameLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/btnViewMonth"
+                android:layout_below="@id/frameLayputbtnViewMonth"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="5dp"
                 android:text="@string/viewMonth" />

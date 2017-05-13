@@ -57,7 +57,7 @@
     <string name="tipStart">Lets Start</string>
     <string name="tipViewForMonth">View details of current month</string>
     <string name="tipListViewSingleClick">Click to view details of item</string>
-    <string name="tipListViewLongPress">Long press to delete item</string>
+    <string name="tipListViewLongPress">Long press to edit item</string>
     <string name="tipMonthClick">Click to view details of month</string>
 
 
@@ -75,6 +75,10 @@
     <string name="backupNotFoundNotify">No recent backup found</string>
 
     <string name="expenseItem">on %1$s</string>
+    <string name="delete">Delete</string>
+    <string name="editSuccess">Successfully Saved</string>
+    <string name="deleteSuccess">Deleted Successfully</string>
+    <string name="deleteConfirmation">Delete selected item?</string>
 
 
 </resources>

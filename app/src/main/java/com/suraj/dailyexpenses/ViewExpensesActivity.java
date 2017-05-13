@@ -97,7 +97,7 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int i, long l) {
-                new AlertDialog.Builder(ViewExpensesActivity.this)
+               /* new AlertDialog.Builder(ViewExpensesActivity.this)
                         .setTitle("Sure?")
                         .setMessage("Delete selected item?")
                         .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
@@ -109,7 +109,11 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
                             }
                         })
                         .setNegativeButton("Cancel", null)
-                        .show();
+                        .show();*/
+
+                Intent intent = new Intent(ViewExpensesActivity.this,EditItemActivity.class);
+                intent.putExtra(Utils.TIMESTAMP_INTENT_STRING,items.get(i).getTimestamp());
+                startActivity(intent);
                 return true;
             }
         });
@@ -146,8 +150,11 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
 
     }
 
-
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateListView();
+    }
 
     private void setDateString() {
         date = Utils.getDayOfWeekString(dayOfWeek) + " " + day + "/" + month + "/" + year;
@@ -391,15 +398,18 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
                         })
                         .setNegativeButton(getResources().getString(R.string.cancel), null)
                         .show();
+                return true;
 
             case R.id.action_backup:
                 requestSelfPermission();
                 Utils.backup();
-                break;
+                return true;
 
             case R.id.action_restore:
                 requestSelfPermission();
                 Utils.restore(true);
+                return true;
+
 
         }
 

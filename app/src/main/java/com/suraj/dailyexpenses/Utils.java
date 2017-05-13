@@ -3,10 +3,8 @@ package com.suraj.dailyexpenses;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Environment;
-import android.support.annotation.Nullable;
 import android.widget.Toast;
 
-import com.suraj.dailyexpenses.data.BasicItem;
 import com.suraj.dailyexpenses.data.BasicItem;
 
 import java.io.BufferedReader;
@@ -33,7 +31,6 @@ import io.realm.RealmConfiguration;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import io.realm.exceptions.RealmMigrationNeededException;
-import io.realm.internal.Util;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
@@ -48,7 +45,8 @@ public class Utils {
 
     public static final String MONTH_NUMBER_INTENT_STRING = "monthNumber";
     public static final String DATE_INTENT_STRING = "date";
-    public static final String ITEM_INTENT_STRING = "BasicItem";
+    public static final String ITEM_INTENT_STRING = "basicitem";
+    public static final String TIMESTAMP_INTENT_STRING = "basicitem";
 
     public static final String SDCARD_DIRECTORY = Environment.getExternalStorageDirectory() + "/DailyExpenses";
 
@@ -66,9 +64,9 @@ public class Utils {
         Realm.init(context);
         Utils.context = context;
 
-        try{
+        try {
             realm = Realm.getDefaultInstance();
-        }catch (RealmMigrationNeededException ex){
+        } catch (RealmMigrationNeededException ex) {
             RealmConfiguration realmConfiguration = new RealmConfiguration.Builder().build();
             Realm.deleteRealm(realmConfiguration);
             realm = Realm.getDefaultInstance();
@@ -131,13 +129,18 @@ public class Utils {
             }
         };
     }
+
     private static Comparator<String> getMonthComparator() {
         return new Comparator<String>() {
             @Override
             public int compare(String s_o, String t1_o) {
-                return getMonthNumberFromString(s_o)-getMonthNumberFromString(t1_o);
+                return getMonthNumberFromString(s_o) - getMonthNumberFromString(t1_o);
             }
         };
+    }
+
+    public static BasicItem getBasicItemFromDataBase(long timestamp){
+        return realm.where(BasicItem.class).equalTo("timestamp",timestamp).findFirst();
     }
 
     public static boolean saveInDatabase(String date, String reason, int amount, boolean isInfrequent) {
@@ -161,21 +164,21 @@ public class Utils {
     }
 
     public static ArrayList<BasicItem> getAllItemsFromDatabase() {
-        RealmQuery<BasicItem>  itemRealmQuery = realm.where(BasicItem.class);
+        RealmQuery<BasicItem> itemRealmQuery = realm.where(BasicItem.class);
 
         ArrayList<BasicItem> items = new ArrayList<>();
 
-        for(BasicItem BasicItem:itemRealmQuery.findAll()){
+        for (BasicItem BasicItem : itemRealmQuery.findAll()) {
             items.add(BasicItem);
         }
 
-        Collections.sort(items,dateComparator);
+        Collections.sort(items, dateComparator);
 
         return items;
     }
 
 
-        public static ArrayList<BasicItem> getItemsForDate(String date) {
+    public static ArrayList<BasicItem> getItemsForDate(String date) {
         RealmQuery<BasicItem> realmQuery = realm.where(BasicItem.class).equalTo("date", date);
 
         ArrayList<BasicItem> results = new ArrayList<>();
@@ -199,7 +202,7 @@ public class Utils {
         ArrayList<BasicItem> results = getItemsForDate(date);
 
         for (BasicItem basicItem : results)
-            if( showInfrequent || !basicItem.isInFrequent())
+            if (showInfrequent || !basicItem.isInFrequent())
                 sum += basicItem.getAmount();
 
         return sum;
@@ -229,6 +232,10 @@ public class Utils {
 
     public static void showToast(String string) {
         Toast.makeText(context, string, Toast.LENGTH_SHORT).show();
+    }
+
+    public static void showToast(int id) {
+        Toast.makeText(context, context.getString(id), Toast.LENGTH_SHORT).show();
     }
 
     public static void deleteFromDatabase(BasicItem BasicItem) {
@@ -266,7 +273,7 @@ public class Utils {
 
             int currentMonth = basicItem.getMonth();
 
-            if (currentMonth==month && (showInfrequent || !basicItem.isInFrequent() )) {
+            if (currentMonth == month && (showInfrequent || !basicItem.isInFrequent())) {
                 sum += basicItem.getAmount();
             }
         }
@@ -286,7 +293,7 @@ public class Utils {
         stringStringHashMap.put("Mar", 3);
         stringStringHashMap.put("Apr", 4);
         stringStringHashMap.put("May", 5);
-        stringStringHashMap.put("June",6);
+        stringStringHashMap.put("June", 6);
         stringStringHashMap.put("July", 7);
         stringStringHashMap.put("Aug", 8);
         stringStringHashMap.put("Sept", 9);
@@ -305,13 +312,13 @@ public class Utils {
 
         for (BasicItem basicItem : realmResults) {
 
-            if(!showInfrequent && basicItem.isInFrequent())
+            if (!showInfrequent && basicItem.isInFrequent())
                 continue;
 
             String date = basicItem.getDate();
 
 
-            if (basicItem.getMonth()==month) {
+            if (basicItem.getMonth() == month) {
                 Integer current = monthExpensesTreeMap.get(date);
                 if (current == null) {
                     monthExpensesTreeMap.put(date, basicItem.getAmount());
@@ -370,9 +377,9 @@ public class Utils {
     }
 
     public static int getSum(List<BasicItem> basicItemList) {
-        int sum =0 ;
-        for(BasicItem basicItem:basicItemList)
-            sum+=basicItem.getAmount();
+        int sum = 0;
+        for (BasicItem basicItem : basicItemList)
+            sum += basicItem.getAmount();
 
         return sum;
     }
@@ -387,7 +394,7 @@ public class Utils {
 
             String date = BasicItem.getDate();
 
-            if(Integer.parseInt(date.split("/")[1])!=clickedMonth)
+            if (Integer.parseInt(date.split("/")[1]) != clickedMonth)
                 continue;
 
 
@@ -412,12 +419,12 @@ public class Utils {
         return basicItems;
     }
 
-    private static void invalidateTempResults(){
+    private static void invalidateTempResults() {
         tempRealmResults = null;
     }
 
 
-    public static HashMap<String,Integer> getTopItemsForMonth(int month){
+    public static HashMap<String, Integer> getTopItemsForMonth(int month) {
         RealmQuery<BasicItem> itemRealmQuery = realm.where(BasicItem.class);
 
         RealmResults<BasicItem> realmResults = itemRealmQuery.findAll();
@@ -430,7 +437,7 @@ public class Utils {
 
             int currentMonth = Integer.parseInt(date.split("/")[1]);
 
-            if(currentMonth!=month)
+            if (currentMonth != month)
                 continue;
 
 
@@ -445,27 +452,27 @@ public class Utils {
 
         HashMap<String, Integer> stringIntegerHashMap = new HashMap<>();
 
-        ArrayList<Map.Entry<String,Integer>> entries =  new ArrayList<>(monthItemExpenses.entrySet());
+        ArrayList<Map.Entry<String, Integer>> entries = new ArrayList<>(monthItemExpenses.entrySet());
 
         Collections.sort(entries, new Comparator<Map.Entry<String, Integer>>() {
             @Override
             public int compare(Map.Entry<String, Integer> integerIntegerEntry, Map.Entry<String, Integer> t1) {
-                return t1.getValue()-integerIntegerEntry.getValue();
+                return t1.getValue() - integerIntegerEntry.getValue();
             }
         });
 
-        for(int i=0;i<4;i++){
-            stringIntegerHashMap.put(entries.get(i).getKey(),entries.get(i).getValue());
+        for (int i = 0; i < 4; i++) {
+            stringIntegerHashMap.put(entries.get(i).getKey(), entries.get(i).getValue());
         }
 
         return stringIntegerHashMap;
     }
 
-    public static MaterialShowcaseSequence getMaterialShowcaseSequence(Activity activity,String ID, MaterialShowcaseView[] materialShowcaseViews){
+    public static MaterialShowcaseSequence getMaterialShowcaseSequence(Activity activity, String ID, MaterialShowcaseView[] materialShowcaseViews) {
         ShowcaseConfig config = new ShowcaseConfig();
         config.setDelay(100);
 
-        MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(activity,ID);
+        MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(activity, ID);
 
         sequence.setConfig(config);
 
@@ -473,42 +480,42 @@ public class Utils {
             Field field = sequence.getClass().getDeclaredField("mShowcaseQueue");
             field.setAccessible(true);
 
-            Queue<MaterialShowcaseView> queue  = (Queue<MaterialShowcaseView>)field.get(sequence);
+            Queue<MaterialShowcaseView> queue = (Queue<MaterialShowcaseView>) field.get(sequence);
 
-            for(MaterialShowcaseView materialShowcaseView:materialShowcaseViews)
+            for (MaterialShowcaseView materialShowcaseView : materialShowcaseViews)
                 queue.add(materialShowcaseView);
 
             return sequence;
 
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         return null;
     }
 
-    public static void backup(){
+    public static void backup() {
         File file = new File(Utils.SDCARD_DIRECTORY + "/backup.csv");
 
-        if(file.exists())
+        if (file.exists())
             file.delete();
 
         try {
             FileWriter fileWriter = new FileWriter(file);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
-            for(BasicItem basicItem:Utils.getAllItemsFromDatabase()){
+            for (BasicItem basicItem : Utils.getAllItemsFromDatabase()) {
                 bufferedWriter.write(basicItem.getDate());
                 bufferedWriter.write(",");
                 bufferedWriter.write(basicItem.getReason());
                 bufferedWriter.write(",");
-                bufferedWriter.write(""+basicItem.getAmount());
+                bufferedWriter.write("" + basicItem.getAmount());
                 bufferedWriter.write(",");
-                bufferedWriter.write(""+basicItem.getTimestamp());
+                bufferedWriter.write("" + basicItem.getTimestamp());
                 bufferedWriter.write(",");
-                bufferedWriter.write(""+basicItem.isInFrequent());
+                bufferedWriter.write("" + basicItem.isInFrequent());
                 bufferedWriter.write("\n");
             }
 
@@ -524,26 +531,26 @@ public class Utils {
 
     }
 
-    public static void deleteEntireDatabase(){
+    public static void deleteEntireDatabase() {
         realm.beginTransaction();
         RealmQuery<BasicItem> itemRealmQuery = realm.where(BasicItem.class);
         itemRealmQuery.findAll().deleteAllFromRealm();
         realm.commitTransaction();
     }
 
-    public static void restore(boolean wipeDatabase){
+    public static void restore(boolean wipeDatabase) {
 
 
         try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(Utils.SDCARD_DIRECTORY+"/backup.csv")));
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(Utils.SDCARD_DIRECTORY + "/backup.csv")));
             String s;
 
-            if(wipeDatabase)
+            if (wipeDatabase)
                 Utils.deleteEntireDatabase();
 
             realm.beginTransaction();
 
-            while (((s=bufferedReader.readLine())!=null)){
+            while (((s = bufferedReader.readLine()) != null)) {
                 String[] splits = s.split(",");
                 BasicItem basicItem = realm.createObject(BasicItem.class);
                 basicItem.setDate(splits[0]);
@@ -564,6 +571,15 @@ public class Utils {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void editItem(BasicItem givenBasicItem) {
+        realm.beginTransaction();
+        BasicItem basicItem = realm.where(BasicItem.class).equalTo("timestamp", givenBasicItem.getTimestamp()).findFirst();
+        basicItem.setReason(givenBasicItem.getReason());
+        basicItem.setAmount(givenBasicItem.getAmount());
+        basicItem.setDate(basicItem.getDate());
+        realm.commitTransaction();
     }
 
 }

@@ -1,14 +1,25 @@
 package com.suraj.dailyexpenses.data;
 
 
+import java.io.Serializable;
+
 import io.realm.RealmObject;
 
 /**
  * Created by suraj on 1/5/17.
  */
-public class BasicItem extends RealmObject{
+public class BasicItem extends RealmObject implements Serializable {
+    private int day;
+    private int month;
+    private int year;
+    private int amount;
+
+    private long timestamp;
+
     private String date;
     private String dayName;
+    private String reason;
+
 
     public String getReason() {
         return reason;
@@ -18,10 +29,15 @@ public class BasicItem extends RealmObject{
         this.reason = reason;
     }
 
-    private String reason;
-    private int day;
-    private int month;
-    private int year;
+    public BasicItem() {
+    }
+
+    public BasicItem(BasicItem basicItem) {
+        this.setDate(basicItem.getDate());
+        this.setReason(basicItem.getReason());
+        this.setAmount(basicItem.getAmount());
+        this.setTimestamp(basicItem.getTimestamp());
+    }
 
     public boolean isInFrequent() {
         return inFrequent;
@@ -65,10 +81,6 @@ public class BasicItem extends RealmObject{
         this.year = year;
     }
 
-    int amount;
-    long timestamp;
-
-
     public String getDate() {
         return date;
     }
@@ -83,8 +95,8 @@ public class BasicItem extends RealmObject{
 
         day = Integer.parseInt(splts1[1]);
 
-        month=Integer.parseInt(splts[1]);
-        year=Integer.parseInt(splts[2]);
+        month = Integer.parseInt(splts[1]);
+        year = Integer.parseInt(splts[2]);
 
     }
 

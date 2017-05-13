@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.suraj.dailyexpenses">
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -20,7 +20,8 @@
         <activity android:name=".ViewExpensesActivity" />
         <activity android:name=".MonthExpensesActivity" />
         <activity android:name=".MonthlyItemActivity" />
-        <activity android:name=".PieChartActivity"></activity>
+        <activity android:name=".PieChartActivity" />
+        <activity android:name=".EditItemActivity"></activity>
     </application>
 
 </manifest>
