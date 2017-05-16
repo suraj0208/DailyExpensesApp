@@ -46,10 +46,10 @@
     <TextView
         android:id="@+id/tvExpenseItemName"
         android:layout_width="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:text="@string/expenseItem"
+        android:layout_height="wrap_content"
         android:layout_alignBaseline="@id/spinMonths"
-        android:layout_height="wrap_content" />
+        android:layout_centerHorizontal="true"
+        android:text="@string/expenseItem" />
 
     <FrameLayout
         android:id="@+id/frameLayoutMonthlyDetails"

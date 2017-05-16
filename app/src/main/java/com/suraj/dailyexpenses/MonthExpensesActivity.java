@@ -1,8 +1,13 @@
 package com.suraj.dailyexpenses;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,6 +41,7 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
     private Button btnMonthlyDetailsMonthName;
 
     private static MonthExpensesActivity monthExpensesActivity;
+    private AlertDialog alertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,12 +64,12 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
         Collections.sort(monthList, Utils.monthComparator);
         spinMonth.setAdapter(new ArrayAdapter<>(MonthExpensesActivity.this, android.R.layout.simple_spinner_dropdown_item, monthList));
 
-        if (monthList.size() > 0 && getIntent().getIntExtra(Utils.MONTH_NUMBER_INTENT_STRING,-1) == -1) {
+        if (monthList.size() > 0 && getIntent().getIntExtra(Utils.MONTH_NUMBER_INTENT_STRING, -1) == -1) {
             spinMonth.setSelection(monthList.size() - 1);
             monthNumber = Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString());
             basicItems = Utils.getDataForMonth(monthNumber, showInfrequent);
         } else if (monthList.size() > 0) {
-            monthNumber = getIntent().getIntExtra(Utils.MONTH_NUMBER_INTENT_STRING,-1);
+            monthNumber = getIntent().getIntExtra(Utils.MONTH_NUMBER_INTENT_STRING, -1);
             basicItems = Utils.getDataForMonth(monthNumber, showInfrequent);
 
             String monthName = Utils.getMonthNameFromNumber(monthNumber);
@@ -87,7 +93,7 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
         }
         tvExpenditureForMonth.setText("" + Utils.getExpensesForMonth(Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString()), showInfrequent));
 
-        updateListView();
+        displayDetailsInViews();
 
         listViewExpensesDays.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -102,7 +108,7 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
         spinMonth.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                updateListView();
+                displayDetailsInViews();
             }
 
             @Override
@@ -111,7 +117,93 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
             }
         });
 
+        setUpSortDialog();
+
         ensureSingleInstanceOnActivityStack();
+    }
+
+    private void setUpSortDialog() {
+        final Utils.SortingComparator sortComparator = new Utils.SortingComparator();
+
+        class SortClickListener implements View.OnClickListener {
+            private AlertDialog alertDialog;
+
+            @Override
+            public void onClick(View view) {
+                switch (view.getId()) {
+                    case R.id.tvSortDateAtoZ:
+                        sortComparator.setType(0);
+                        Collections.sort(basicItems, sortComparator);
+                        updateListView();
+                        alertDialog.dismiss();
+                        break;
+
+                    case R.id.tvSortDateZtoA:
+                        sortComparator.setType(1);
+                        Collections.sort(basicItems, sortComparator);
+                        updateListView();
+                        alertDialog.dismiss();
+                        break;
+
+                    case R.id.tvSortAmountAtoZ:
+                        sortComparator.setType(2);
+                        Collections.sort(basicItems, sortComparator);
+                        updateListView();
+                        alertDialog.dismiss();
+                        break;
+
+                    case R.id.tvSortAmountZtoA:
+                        sortComparator.setType(3);
+                        Collections.sort(basicItems, sortComparator);
+                        updateListView();
+                        alertDialog.dismiss();
+                        tvExpenditureForMonth.setText("↓");
+                        break;
+
+                }
+            }
+
+            public void setAlertDialog(AlertDialog alertDialog) {
+                this.alertDialog = alertDialog;
+            }
+        }
+
+        final SortClickListener sortClickListener = new SortClickListener();
+
+        LayoutInflater layoutInflater = LayoutInflater.from(MonthExpensesActivity.this);
+
+        View dialogView = layoutInflater.inflate(R.layout.dialog_sort, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MonthExpensesActivity.this);
+
+        final TextView[] textViews = new TextView[]{ (TextView) dialogView.findViewById(R.id.tvSortDateAtoZ), (TextView) dialogView.findViewById(R.id.tvSortDateZtoA),(TextView) dialogView.findViewById(R.id.tvSortAmountAtoZ), (TextView) dialogView.findViewById(R.id.tvSortAmountZtoA)};
+
+        for(int i=0;i<textViews.length;i++){
+            if(i==sortComparator.getType())
+                textViews[i].setTextColor(ContextCompat.getColor(getApplication(), R.color.colorAccent));
+            else
+                textViews[i].setTextColor(ContextCompat.getColor(getApplication(), android.R.color.primary_text_light));
+
+            textViews[i].setOnClickListener(sortClickListener);
+        }
+
+        builder.setView(dialogView);
+
+
+        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                for(int i=0;i<textViews.length;i++){
+                    if(i==sortComparator.getType())
+                        textViews[i].setTextColor(ContextCompat.getColor(getApplication(), R.color.colorAccent));
+                    else
+                        textViews[i].setTextColor(ContextCompat.getColor(getApplication(), android.R.color.primary_text_light));
+                }
+            }
+        });
+
+        alertDialog = builder.create();
+        sortClickListener.setAlertDialog(alertDialog);
     }
 
     private void ensureSingleInstanceOnActivityStack() {
@@ -142,7 +234,11 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
                     item.setIcon(R.drawable.ic_infrequents);
                     Utils.showToast(getString(R.string.excludingInfrequentNotify));
                 }
-                updateListView();
+                displayDetailsInViews();
+                break;
+
+            case R.id.action_sort:
+                alertDialog.show();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -155,14 +251,22 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
         ((TextView) rowView.findViewById(R.id.tvItemAmount)).setText(getResources().getString(R.string.rs, basicItem.getAmount()));
     }
 
-    private void updateListView() {
-        monthNumber = Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString());
-        basicItems = Utils.getDataForMonth(monthNumber, showInfrequent);
-        Collections.sort(basicItems, Utils.dateComparator);
+    private void displayDetailsInViews() {
+        getItemsFromDB();
+        updateListView();
+    }
 
+    private void updateListView() {
         BasicItemsAdapter basicItemsAdapter = new BasicItemsAdapter(getApplicationContext(), basicItems, this);
         listViewExpensesDays.setAdapter(basicItemsAdapter);
         tvExpenditureForMonth.setText("" + Utils.getExpensesForMonth(Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString()), showInfrequent));
         btnMonthlyDetailsMonthName.setText(spinMonth.getSelectedItem().toString());
     }
+
+    private void getItemsFromDB() {
+        monthNumber = Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString());
+        basicItems = Utils.getDataForMonth(monthNumber, showInfrequent);
+        Collections.sort(basicItems, Utils.dateComparator);
+    }
+
 }
