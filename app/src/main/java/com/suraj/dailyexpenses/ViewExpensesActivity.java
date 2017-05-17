@@ -97,22 +97,11 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int i, long l) {
-               /* new AlertDialog.Builder(ViewExpensesActivity.this)
-                        .setTitle("Sure?")
-                        .setMessage("Delete selected item?")
-                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Utils.deleteFromDatabase(items.get(i));
-                                items.remove(i);
-                                updateListView();
-                            }
-                        })
-                        .setNegativeButton("Cancel", null)
-                        .show();*/
+                if(!isDataAvailableForCurrentDate())
+                    return true;
 
-                Intent intent = new Intent(ViewExpensesActivity.this,EditItemActivity.class);
-                intent.putExtra(Utils.TIMESTAMP_INTENT_STRING,items.get(i).getTimestamp());
+                Intent intent = new Intent(ViewExpensesActivity.this, EditItemActivity.class);
+                intent.putExtra(Utils.TIMESTAMP_INTENT_STRING, items.get(i).getTimestamp());
                 startActivity(intent);
                 return true;
             }
@@ -121,6 +110,9 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if(!isDataAvailableForCurrentDate())
+                    return;
+
                 Intent intent = new Intent(ViewExpensesActivity.this, MonthlyItemActivity.class);
                 intent.putExtra(Utils.ITEM_INTENT_STRING, items.get(i).getReason());
                 startActivity(intent);
@@ -229,12 +221,12 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
 
         MaterialShowcaseSequence sequence;
 
-        sequence = Utils.getMaterialShowcaseSequence(this, Utils.VIEW_EXPENSES_ACTIVITY_BUTTON_TIPS, new MaterialShowcaseView[]{materialShowcaseSelectDate,materialShowcaseViewClickMonth});
+        sequence = Utils.getMaterialShowcaseSequence(this, Utils.VIEW_EXPENSES_ACTIVITY_BUTTON_TIPS, new MaterialShowcaseView[]{materialShowcaseSelectDate, materialShowcaseViewClickMonth});
 
         if (sequence != null) {
             sequence.start();
 
-            if(sequence.hasFired())
+            if (sequence.hasFired())
                 showTipsForListView();
 
         }
@@ -265,7 +257,7 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
                 .build();
 
         if (listView.getAdapter().getCount() > 0) {
-            sequence = Utils.getMaterialShowcaseSequence(this, Utils.VIEW_EXPENSES_ACTIVITY_LISTVIEW_TIPS, new MaterialShowcaseView[]{materialShowcaseViewSingleClick,materialShowcaseViewLongPress});
+            sequence = Utils.getMaterialShowcaseSequence(this, Utils.VIEW_EXPENSES_ACTIVITY_LISTVIEW_TIPS, new MaterialShowcaseView[]{materialShowcaseViewSingleClick, materialShowcaseViewLongPress});
 
             if (sequence != null)
                 sequence.start();
@@ -440,6 +432,14 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
 
     private void updateListView() {
         items = Utils.getItemsForDate(date);
+
+        if (!isDataAvailableForCurrentDate()) {
+            BasicItem basicItem = new BasicItem();
+            basicItem.setReason(getString(R.string.noData));
+            basicItem.setAmount(-1);
+            items.add(basicItem);
+        }
+
         listView.setAdapter(new BasicItemsAdapter(getApplicationContext(), items, this));
         tvExpenditureForDate.setText("" + Utils.getExpenditureForDate(date, true));
         tvExpenditureForMonth.setText("" + Utils.getExpensesForMonth(Integer.parseInt(date.split("/")[1]), true));
@@ -458,12 +458,19 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
         ((TextView) rowView.findViewById(R.id.tvItemName)).setText(item.getReason());
         ((TextView) rowView.findViewById(R.id.tvItemAmount)).setText(getResources().getString(R.string.rs, item.getAmount()));
 
+        if (!isDataAvailableForCurrentDate()) {
+            (rowView.findViewById(R.id.tvItemAmount)).setVisibility(View.INVISIBLE);
+        }
     }
 
     public void requestSelfPermission() {
         if (ContextCompat.checkSelfPermission(ViewExpensesActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(ViewExpensesActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
         }
+    }
+
+    private boolean isDataAvailableForCurrentDate() {
+        return items.size() >0 && items.get(0) != null && items.get(0).getAmount() != -1;
     }
 
     private AlertDialog.Builder getInputDialogBuilder(String defaultText) {

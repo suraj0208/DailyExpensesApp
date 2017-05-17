@@ -2,7 +2,6 @@ package com.suraj.dailyexpenses;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -32,6 +31,8 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
 
     private ArrayList<BasicItem> basicItems;
 
+    private Utils.SortingComparator sortingComparator;
+
     private Spinner spinMonth;
 
     private TextView tvExpenditureForMonth;
@@ -48,6 +49,10 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_month_expenses);
 
+        showInfrequent = true;
+        sortingComparator = new Utils.SortingComparator();
+        sortingComparator.setType(0);
+
         spinMonth = (Spinner) findViewById(R.id.spinMonths);
 
         tvExpenditureForMonth = (TextView) findViewById(R.id.tvExpenditureForMonth);
@@ -55,8 +60,6 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
         listViewExpensesDays = (ListView) findViewById(R.id.lstViewDaysOfMonth);
 
         btnMonthlyDetailsMonthName = (Button) findViewById(R.id.btnMonthlyDetailsMonthName);
-
-        showInfrequent = true;
 
         (findViewById(R.id.tvExpenseItemName)).setVisibility(View.GONE);
 
@@ -98,6 +101,10 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
         listViewExpensesDays.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                if(!isDataAvailableForCurrentMonth())
+                    return;
+
                 String date = basicItems.get(i).getDate();
                 Intent intent = new Intent(MonthExpensesActivity.this, ViewExpensesActivity.class);
                 intent.putExtra(Utils.DATE_INTENT_STRING, date);
@@ -123,8 +130,6 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
     }
 
     private void setUpSortDialog() {
-        final Utils.SortingComparator sortComparator = new Utils.SortingComparator();
-
         class SortClickListener implements View.OnClickListener {
             private AlertDialog alertDialog;
 
@@ -132,32 +137,31 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
             public void onClick(View view) {
                 switch (view.getId()) {
                     case R.id.tvSortDateAtoZ:
-                        sortComparator.setType(0);
-                        Collections.sort(basicItems, sortComparator);
+                        sortingComparator.setType(0);
+                        Collections.sort(basicItems, sortingComparator);
                         updateListView();
                         alertDialog.dismiss();
                         break;
 
                     case R.id.tvSortDateZtoA:
-                        sortComparator.setType(1);
-                        Collections.sort(basicItems, sortComparator);
+                        sortingComparator.setType(1);
+                        Collections.sort(basicItems, sortingComparator);
                         updateListView();
                         alertDialog.dismiss();
                         break;
 
                     case R.id.tvSortAmountAtoZ:
-                        sortComparator.setType(2);
-                        Collections.sort(basicItems, sortComparator);
+                        sortingComparator.setType(2);
+                        Collections.sort(basicItems, sortingComparator);
                         updateListView();
                         alertDialog.dismiss();
                         break;
 
                     case R.id.tvSortAmountZtoA:
-                        sortComparator.setType(3);
-                        Collections.sort(basicItems, sortComparator);
+                        sortingComparator.setType(3);
+                        Collections.sort(basicItems, sortingComparator);
                         updateListView();
                         alertDialog.dismiss();
-                        tvExpenditureForMonth.setText("↓");
                         break;
 
                 }
@@ -176,10 +180,10 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MonthExpensesActivity.this);
 
-        final TextView[] textViews = new TextView[]{ (TextView) dialogView.findViewById(R.id.tvSortDateAtoZ), (TextView) dialogView.findViewById(R.id.tvSortDateZtoA),(TextView) dialogView.findViewById(R.id.tvSortAmountAtoZ), (TextView) dialogView.findViewById(R.id.tvSortAmountZtoA)};
+        final TextView[] textViews = new TextView[]{(TextView) dialogView.findViewById(R.id.tvSortDateAtoZ), (TextView) dialogView.findViewById(R.id.tvSortDateZtoA), (TextView) dialogView.findViewById(R.id.tvSortAmountAtoZ), (TextView) dialogView.findViewById(R.id.tvSortAmountZtoA)};
 
-        for(int i=0;i<textViews.length;i++){
-            if(i==sortComparator.getType())
+        for (int i = 0; i < textViews.length; i++) {
+            if (i == sortingComparator.getType())
                 textViews[i].setTextColor(ContextCompat.getColor(getApplication(), R.color.colorAccent));
             else
                 textViews[i].setTextColor(ContextCompat.getColor(getApplication(), android.R.color.primary_text_light));
@@ -193,8 +197,8 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
         builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
-                for(int i=0;i<textViews.length;i++){
-                    if(i==sortComparator.getType())
+                for (int i = 0; i < textViews.length; i++) {
+                    if (i == sortingComparator.getType())
                         textViews[i].setTextColor(ContextCompat.getColor(getApplication(), R.color.colorAccent));
                     else
                         textViews[i].setTextColor(ContextCompat.getColor(getApplication(), android.R.color.primary_text_light));
@@ -266,7 +270,20 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
     private void getItemsFromDB() {
         monthNumber = Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString());
         basicItems = Utils.getDataForMonth(monthNumber, showInfrequent);
-        Collections.sort(basicItems, Utils.dateComparator);
+
+        if (!isDataAvailableForCurrentMonth()) {
+            BasicItem basicItem = new BasicItem();
+            basicItem.setReason(getString(R.string.noData));
+            basicItem.setAmount(-1);
+            basicItems.add(basicItem);
+        }
+
+        Collections.sort(basicItems, sortingComparator);
+
+    }
+
+    private boolean isDataAvailableForCurrentMonth() {
+        return basicItems.size() > 0 && basicItems.get(0) != null && basicItems.get(0).getAmount() != -1;
     }
 
 }

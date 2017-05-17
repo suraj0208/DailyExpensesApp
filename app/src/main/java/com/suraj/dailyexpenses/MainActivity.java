@@ -191,19 +191,36 @@ public class MainActivity extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (etSpendReason.getText().length() == 0 || etSpentAmount.getText().length() == 0) {
+                String reason = etSpendReason.getText().toString().trim();
+                String amount = etSpentAmount.getText().toString().trim();
+
+                if ( reason.length()== 0 || amount.length() == 0) {
                     Utils.showToast(getResources().getString(R.string.validDataError));
                     return;
                 }
 
-                Utils.saveInDatabase(tvDate.getText().toString(), etSpendReason.getText().toString().trim(), Integer.parseInt(etSpentAmount.getText().toString().trim()), chkBoxInfrequent.isChecked());
-                tvTodayExpenditure.setText(getResources().getString(R.string.todaysExpenditure, Utils.getExpenditureForDate(tvDate.getText().toString(), true)));
-                etSpentAmount.setText("");
-                etSpendReason.setText("");
+                try {
+                    int intAmount = Integer.parseInt(amount);
+
+                    if ( intAmount <=0 ) {
+                        Utils.showToast(getResources().getString(R.string.validDataError));
+                        return;
+                    }
+
+                    Utils.saveInDatabase(tvDate.getText().toString(),reason, intAmount, chkBoxInfrequent.isChecked());
+                    tvTodayExpenditure.setText(getResources().getString(R.string.todaysExpenditure, Utils.getExpenditureForDate(tvDate.getText().toString(), true)));
+                    etSpentAmount.setText("");
+                    etSpendReason.setText("");
+                    chkBoxInfrequent.setChecked(false);
+
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+
                 MainActivity.this.closeIME(etSpendReason);
+
             }
         });
-
 
     }
 
