@@ -1,8 +1,11 @@
 package com.suraj.dailyexpenses;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -127,6 +130,15 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
         setUpSortDialog();
 
         ensureSingleInstanceOnActivityStack();
+
+        requestSelfPermission();
+
+    }
+
+    public void requestSelfPermission() {
+        if (ContextCompat.checkSelfPermission(MonthExpensesActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MonthExpensesActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+        }
     }
 
     private void setUpSortDialog() {
@@ -243,6 +255,10 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
 
             case R.id.action_sort:
                 alertDialog.show();
+                break;
+
+            case R.id.action_export_monthly:
+                Utils.exportMonthlyDetails();
                 break;
         }
         return super.onOptionsItemSelected(item);

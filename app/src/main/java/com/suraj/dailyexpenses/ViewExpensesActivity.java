@@ -365,6 +365,12 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
 
                                     for (BasicItem item : Utils.getAllItemsFromDatabase()) {
                                         if (!item.getDate().equals(prevDate)) {
+                                            bufferedWriter.write(",");
+                                            bufferedWriter.write("Total");
+                                            bufferedWriter.write(",");
+                                            bufferedWriter.write(""+Utils.getExpenditureForDate(prevDate,true));
+                                            bufferedWriter.write("\n");
+                                            bufferedWriter.write("\n");
                                             bufferedWriter.write(item.getDate());
                                         } else {
                                             bufferedWriter.write("");

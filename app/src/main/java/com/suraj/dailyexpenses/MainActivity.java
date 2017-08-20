@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
         setupTips();
 
         ensureSingleInstanceOnActivityStack();
+        loadFromNotification();
 
 //        HashMap<String,Integer> stringIntegerHashMap = Utils.getTopItemsForMonth(4);
 //
@@ -103,6 +104,18 @@ public class MainActivity extends AppCompatActivity {
 //        }
 //        startActivity(new Intent(MainActivity.this, PieChartActivity.class));
 
+    }
+
+    private void loadFromNotification() {
+
+        if(getIntent().getExtras()==null)
+            return;
+
+        int rs = getIntent().getIntExtra("rs",-1);
+
+        if(rs!=-1){
+            etSpentAmount.setText(""+rs);
+        }
     }
 
     private void initPickerViews(int day,int month) {

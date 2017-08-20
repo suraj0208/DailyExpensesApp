@@ -3,6 +3,7 @@
     package="com.suraj.dailyexpenses">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
 
     <application
         android:allowBackup="true"
@@ -21,7 +22,13 @@
         <activity android:name=".MonthExpensesActivity" />
         <activity android:name=".MonthlyItemActivity" />
         <activity android:name=".PieChartActivity" />
-        <activity android:name=".EditItemActivity"></activity>
+        <activity android:name=".EditItemActivity"/>
+
+        <receiver android:name=".SMSReceiver">
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

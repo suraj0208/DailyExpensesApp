@@ -61,12 +61,13 @@ public class Utils {
 
     private static RealmResults<BasicItem> tempRealmResults;
 
-    static class SortingComparator implements Comparator<BasicItem>{
+    static class SortingComparator implements Comparator<BasicItem> {
         public int getType() {
             return type;
         }
 
-        private int type=0;
+        private int type = 0;
+
         /**
          * 0 date a-z
          * 1 date z-a
@@ -76,7 +77,7 @@ public class Utils {
 
         @Override
         public int compare(BasicItem b1, BasicItem b2) {
-            switch (type){
+            switch (type) {
                 case 0:
                     if (b1.getYear() != b2.getYear()) {
                         return b1.getYear() - b2.getYear();
@@ -194,8 +195,8 @@ public class Utils {
         };
     }
 
-    public static BasicItem getBasicItemFromDataBase(long timestamp){
-        return realm.where(BasicItem.class).equalTo("timestamp",timestamp).findFirst();
+    public static BasicItem getBasicItemFromDataBase(long timestamp) {
+        return realm.where(BasicItem.class).equalTo("timestamp", timestamp).findFirst();
     }
 
     public static boolean saveInDatabase(String date, String reason, int amount, boolean isInfrequent) {
@@ -593,9 +594,87 @@ public class Utils {
         realm.commitTransaction();
     }
 
+    public static void exportMonthlyDetails() {
+        File file = new File(Utils.SDCARD_DIRECTORY + "/monthly_details.csv");
+
+        if (file.exists())
+            file.delete();
+
+        ArrayList<String> months = Utils.getMonthsFromDatabase();
+
+        HashMap<String, Integer> detailsHashMap = new HashMap<>();
+
+        for (BasicItem basicItem : Utils.getAllItemsFromDatabase()) {
+
+            String currentMonth = Utils.getMonthNameFromNumber(basicItem.getMonth()) + " " + basicItem.getYear();
+
+            Integer currentAmount = detailsHashMap.get(currentMonth);
+
+            if (currentAmount == null) {
+                detailsHashMap.put(currentMonth, basicItem.getAmount());
+            } else {
+                detailsHashMap.put(currentMonth, currentAmount + basicItem.getAmount());
+            }
+        }
+
+        ArrayList<Map.Entry<String, Integer>> list = new ArrayList<>(detailsHashMap.entrySet());
+
+        Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+            @Override
+            public int compare(Map.Entry<String, Integer> stringIntegerEntry, Map.Entry<String, Integer> t1) {
+                String[] monthYear1 = stringIntegerEntry.getKey().split(" ");
+
+                int month1 = Utils.getMonthNumberFromString(monthYear1[0]);
+                int year1 = Integer.parseInt(monthYear1[1]);
+
+                String[] monthYear2 = t1.getKey().split(" ");
+
+                int month2 = Utils.getMonthNumberFromString(monthYear2[0]);
+                int year2 = Integer.parseInt(monthYear2[1]);
+
+                if (year1 != year2) {
+                    return year1 - year2;
+                }
+
+
+                return month1 - month2;
+            }
+        });
+
+        try
+
+        {
+            FileWriter fileWriter = new FileWriter(file);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+
+            bufferedWriter.write("Month");
+            bufferedWriter.write(",");
+            bufferedWriter.write("Amount ( Rs )");
+            bufferedWriter.write("\n");
+
+            for (Map.Entry<String, Integer> entry : list) {
+                bufferedWriter.write(entry.getKey());
+                bufferedWriter.write(",");
+                bufferedWriter.write("" + entry.getValue());
+                bufferedWriter.write("\n");
+            }
+
+            bufferedWriter.close();
+            fileWriter.close();
+
+            Utils.showToast(context.getString(R.string.exportSuccessfulNotify));
+
+        } catch (
+                IOException e
+                )
+
+        {
+            e.printStackTrace();
+        }
+
+    }
+
     public static void restore(boolean wipeDatabase) {
-
-
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(Utils.SDCARD_DIRECTORY + "/backup.csv")));
             String s;
@@ -633,8 +712,16 @@ public class Utils {
         BasicItem basicItem = realm.where(BasicItem.class).equalTo("timestamp", givenBasicItem.getTimestamp()).findFirst();
         basicItem.setReason(givenBasicItem.getReason());
         basicItem.setAmount(givenBasicItem.getAmount());
-        basicItem.setDate(basicItem.getDate());
+        basicItem.setDate(givenBasicItem.getDate());
+        basicItem.setInFrequent(givenBasicItem.isInFrequent());
         realm.commitTransaction();
     }
 
 }
+
+/*
+TODO
+fix last day total in export all
+fix total on first line in export all
+
+ */

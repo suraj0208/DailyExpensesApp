@@ -80,6 +80,8 @@
     <string name="deleteSuccess">Deleted Successfully</string>
     <string name="deleteConfirmation">Delete selected item?</string>
     <string name="noData">No data available</string>
+    <string name="sort_arrow">↓</string>
+    <string name="export_monthly">Export Monthly Details</string>
 
 
 </resources>
