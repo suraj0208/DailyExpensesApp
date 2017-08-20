@@ -82,6 +82,9 @@
     <string name="noData">No data available</string>
     <string name="sort_arrow">↓</string>
     <string name="export_monthly">Export Monthly Details</string>
+    <string name="reminderNameHint">Item Name</string>
+    <string name="AddReminder">Add</string>
+    <string name="setReminderTimeHint">Click to set time</string>
 
 
 </resources>

@@ -20,4 +20,10 @@
         android:title="@string/export_monthly"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_reminder_activity"
+        android:orderInCategory="100"
+        android:title="Reminders"
+        app:showAsAction="never" />
+
 </menu>
