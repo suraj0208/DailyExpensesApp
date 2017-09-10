@@ -36,7 +36,7 @@ public class EditItemActivity extends AppCompatActivity {
 
         (etEditItemReason = (EditText) findViewById(R.id.etEditItemReason)).setText(basicItem.getReason());
         (etEditItemAmount = (EditText) findViewById(R.id.etEditItemAmount)).setText(Integer.toString(basicItem.getAmount()));
-        (checkboxEditInfrequent = (CheckBox) findViewById(R.id.checkboxEditInfrequent)).setChecked(basicItem.isInFrequent());
+        //(checkboxEditInfrequent = (CheckBox) findViewById(R.id.checkboxEditInfrequent)).setChecked(basicItem.isInFrequent());
 
         (findViewById(R.id.btnEditDelete)).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,7 +80,7 @@ public class EditItemActivity extends AppCompatActivity {
 
                 newBasicItem.setReason(etEditItemReason.getText().toString());
                 newBasicItem.setAmount(Integer.parseInt(etEditItemAmount.getText().toString()));
-                newBasicItem.setInFrequent(checkboxEditInfrequent.isChecked());
+                //newBasicItem.setInFrequent(checkboxEditInfrequent.isChecked());
 
                 Utils.editItem(newBasicItem);
                 Utils.showToast(R.string.editSuccess);

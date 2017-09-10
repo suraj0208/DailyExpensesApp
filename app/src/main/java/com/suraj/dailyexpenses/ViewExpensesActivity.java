@@ -448,7 +448,7 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
 
         listView.setAdapter(new BasicItemsAdapter(getApplicationContext(), items, this));
         tvExpenditureForDate.setText("" + Utils.getExpenditureForDate(date, true));
-        tvExpenditureForMonth.setText("" + Utils.getExpensesForMonth(Integer.parseInt(date.split("/")[1]), true));
+        tvExpenditureForMonth.setText("" + Utils.getExpensesForMonth(Integer.parseInt(date.split("/")[1]), null));
 
         btnCurrentDate.setText(day + "/" + month);
         btnCurrentMonth.setText(Utils.getMonthNameFromNumber(Integer.parseInt(date.split("/")[1])));

@@ -6,21 +6,26 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.Calendar;
 import java.util.HashSet;
+import java.util.List;
 
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
@@ -42,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText etSpendReason;
     private EditText etSpentAmount;
 
-    private CheckBox chkBoxInfrequent;
+    private EditText etTag;
 
     private static MainActivity mainActivity;
 
@@ -55,19 +60,22 @@ public class MainActivity extends AppCompatActivity {
 
         tvDate = (TextView) findViewById(R.id.tvDate);
         tvTodayExpenditure = (TextView) findViewById(R.id.tvTodaysExpenditure);
-        tvPickDate = (TextView)findViewById(R.id.tvPickDate);
+        tvPickDate = (TextView) findViewById(R.id.tvPickDate);
 
         etSpendReason = (EditText) findViewById(R.id.etSpendReason);
+        etSpendReason.requestFocus();
         etSpentAmount = (EditText) findViewById(R.id.etSpentAmount);
 
-        chkBoxInfrequent = (CheckBox) findViewById(R.id.chkboxInfrequent);
+        etTag = (EditText) findViewById(R.id.etTag);
+        etTag.setText(R.string.daily_tag);
 
         initReasonViews();
+        initTagViews();
         initAmountViews();
         initSaveButton();
         initViewButtons();
 
-        btnSetDate = (Button)findViewById(R.id.btnSetDate);
+        btnSetDate = (Button) findViewById(R.id.btnSetDate);
         btnSetDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -81,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         month = calendar.get(Calendar.MONTH);
         day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        initPickerViews(day,month);
+        initPickerViews(day, month);
 
         showDateOnTextView(calendar.get(Calendar.DAY_OF_WEEK), year, month + 1, day);
 
@@ -108,32 +116,97 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void initTagViews() {
+        class BooleanHolder {
+            boolean bool;
+        }
+
+        final BooleanHolder prevFocus = new BooleanHolder();
+
+        etTag.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+
+                if (!prevFocus.bool) {
+                    showTagsDialog();
+                }
+
+                if (b) {
+                    prevFocus.bool = true;
+                } else {
+                    prevFocus.bool = false;
+                }
+
+            }
+        });
+
+        etTag.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showTagsDialog();
+            }
+        });
+    }
+
+    public void showTagsDialog() {
+        LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
+
+        View dialogView = layoutInflater.inflate(R.layout.dialog_tags, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+        ListView listViewTags = (ListView) dialogView.findViewById(R.id.listViewTags);
+
+        dialogView.findViewById(R.id.btnDone).setVisibility(View.GONE);
+
+        final List<String> tags = Utils.getAllTags();
+
+        ArrayAdapter<String> itemsAdapter =
+                new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_list_item_1, tags);
+
+        builder.setView(dialogView);
+
+        listViewTags.setAdapter(itemsAdapter);
+
+
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+        listViewTags.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                etTag.setText(tags.get(i));
+                alertDialog.dismiss();
+            }
+        });
+    }
+
     private void loadFromNotification() {
 
-        if(getIntent().getExtras()==null)
+        if (getIntent().getExtras() == null)
             return;
 
         String name = getIntent().getStringExtra("name");
-        int rs = getIntent().getIntExtra("rs",-1);
+        int rs = getIntent().getIntExtra("rs", -1);
 
-        if(rs!=-1){
-            etSpentAmount.setText(""+rs);
+        if (rs != -1) {
+            etSpentAmount.setText("" + rs);
         }
-        if(name!=null){
+        if (name != null) {
             etSpendReason.setText(name);
         }
 
-        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(965778);
     }
 
-    private void initPickerViews(int day,int month) {
-        tvPickDate.setText(""+day);
-        btnSetDate.setText(Utils.getMonthNameFromNumber(month+1));
+    private void initPickerViews(int day, int month) {
+        tvPickDate.setText("" + day);
+        btnSetDate.setText(Utils.getMonthNameFromNumber(month + 1));
     }
 
     private void ensureSingleInstanceOnActivityStack() {
-        if(MainActivity.mainActivity!=null){
+        if (MainActivity.mainActivity != null) {
             MainActivity.mainActivity.finish();
         }
         MainActivity.mainActivity = this;
@@ -214,9 +287,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String reason = etSpendReason.getText().toString().trim();
+                String tag = etTag.getText().toString().trim();
                 String amount = etSpentAmount.getText().toString().trim();
 
-                if ( reason.length()== 0 || amount.length() == 0) {
+                if (reason.length() == 0 || tag.length() == 0 || amount.length() == 0) {
                     Utils.showToast(getResources().getString(R.string.validDataError));
                     return;
                 }
@@ -224,18 +298,16 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     int intAmount = Integer.parseInt(amount);
 
-                    if ( intAmount <=0 ) {
+                    if (intAmount <= 0) {
                         Utils.showToast(getResources().getString(R.string.validDataError));
                         return;
                     }
 
-                    Utils.saveInDatabase(tvDate.getText().toString(),reason, intAmount, chkBoxInfrequent.isChecked());
+                    Utils.saveInDatabase(tvDate.getText().toString(), reason, intAmount, tag);
                     tvTodayExpenditure.setText(getResources().getString(R.string.todaysExpenditure, Utils.getExpenditureForDate(tvDate.getText().toString(), true)));
                     etSpentAmount.setText("");
                     etSpendReason.setText("");
-                    chkBoxInfrequent.setChecked(false);
-
-                }catch (Exception ex){
+                } catch (Exception ex) {
                     ex.printStackTrace();
                 }
 
@@ -331,7 +403,7 @@ public class MainActivity extends AppCompatActivity {
 
         final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.addRule(RelativeLayout.BELOW, R.id.tvDate);
-        layoutParams.addRule(RelativeLayout.LEFT_OF, R.id.chkboxInfrequent);
+        layoutParams.addRule(RelativeLayout.LEFT_OF, R.id.etTag);
 
         layoutParams.setMargins(((RelativeLayout.LayoutParams) etSpendReason.getLayoutParams()).leftMargin, ((RelativeLayout.LayoutParams) etSpendReason.getLayoutParams()).topMargin, ((RelativeLayout.LayoutParams) etSpendReason.getLayoutParams()).rightMargin, 0);
 
@@ -344,17 +416,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 if (etSpendReason.getText().length() == 0) {
-                    chkBoxInfrequent.setVisibility(View.GONE);
+                    //etTag.setVisibility(View.GONE);
                     hzScrollView.setVisibility(View.VISIBLE);
                     etSpendReason.setLayoutParams(layoutParams);
                 } else {
                     hzScrollView.setVisibility(View.GONE);
-                    chkBoxInfrequent.setVisibility(View.VISIBLE);
+                    //etTag.setVisibility(View.VISIBLE);
                     etSpendReason.setLayoutParams(layoutParams);
                 }
 
                 if (commonReasons.contains(etSpendReason.getText().toString())) {
-                    chkBoxInfrequent.setVisibility(View.GONE);
+                    //etTag.setVisibility(View.GONE);
                     hzScrollView.setVisibility(View.VISIBLE);
                     etSpendReason.setLayoutParams(layoutParams);
                 }
@@ -376,7 +448,7 @@ public class MainActivity extends AppCompatActivity {
                     Calendar calendar = Calendar.getInstance();
                     calendar.set(year, month, day);
                     int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-                    initPickerViews(day,month);
+                    initPickerViews(day, month);
                     showDateOnTextView(dayOfWeek, year, month + 1, day);
                     showTodayExpenditure();
                 }

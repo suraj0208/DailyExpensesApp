@@ -9,9 +9,9 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/action_infrequents"
+        android:id="@+id/action_tags"
         android:orderInCategory="100"
-        android:title="@string/all"
+        android:title="@string/action_item_tag"
         app:showAsAction="ifRoom" />
 
     <item

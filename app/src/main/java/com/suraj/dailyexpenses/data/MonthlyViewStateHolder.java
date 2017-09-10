@@ -1,0 +1,29 @@
+package com.suraj.dailyexpenses.data;
+
+import java.util.Collection;
+import java.util.HashSet;
+
+public class MonthlyViewStateHolder{
+    private HashSet<String> currentTags;
+
+    public MonthlyViewStateHolder(){
+        currentTags = new HashSet<>();
+    }
+
+    public void removeElement(String element){
+        currentTags.remove(element);
+    }
+
+    public void addElement(String element){
+        currentTags.add(element);
+    }
+
+    public void addAllElements(Collection<String> elements){
+        currentTags.addAll(elements);
+    }
+
+    public boolean isElementIncluded(String element){
+        return currentTags.contains(element);
+    }
+
+}

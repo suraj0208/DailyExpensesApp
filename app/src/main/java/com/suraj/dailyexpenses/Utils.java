@@ -8,6 +8,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.suraj.dailyexpenses.data.BasicItem;
+import com.suraj.dailyexpenses.data.MonthlyViewStateHolder;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -207,7 +208,7 @@ public class Utils {
         return realm.where(BasicItem.class).equalTo("timestamp", timestamp).findFirst();
     }
 
-    public static boolean saveInDatabase(String date, String reason, int amount, boolean isInfrequent) {
+    public static boolean saveInDatabase(String date, String reason, int amount, String tag) {
         try {
             realm.beginTransaction();
 
@@ -216,7 +217,7 @@ public class Utils {
             basicItem.setReason(reason);
             basicItem.setAmount(amount);
             basicItem.setTimestamp(System.currentTimeMillis());
-            basicItem.setInFrequent(isInfrequent);
+            basicItem.setTag(tag);
             realm.commitTransaction();
             return true;
 
@@ -266,7 +267,6 @@ public class Utils {
         ArrayList<BasicItem> results = getItemsForDate(date);
 
         for (BasicItem basicItem : results)
-            if (showInfrequent || !basicItem.isInFrequent())
                 sum += basicItem.getAmount();
 
         return sum;
@@ -329,7 +329,7 @@ public class Utils {
         return new ArrayList<>(monthSet);
     }
 
-    public static int getExpensesForMonth(int month, boolean showInfrequent) {
+    public static int getExpensesForMonth(int month, MonthlyViewStateHolder monthlyViewStateHolder) {
         RealmQuery<BasicItem> itemRealmQuery = realm.where(BasicItem.class);
         RealmResults<BasicItem> realmResults = itemRealmQuery.findAll();
         int sum = 0;
@@ -337,7 +337,7 @@ public class Utils {
 
             int currentMonth = basicItem.getMonth();
 
-            if (currentMonth == month && (showInfrequent || !basicItem.isInFrequent())) {
+            if (currentMonth == month && (  monthlyViewStateHolder == null ||  monthlyViewStateHolder.isElementIncluded(basicItem.getTag()) ) ) {
                 sum += basicItem.getAmount();
             }
         }
@@ -368,21 +368,16 @@ public class Utils {
         return stringStringHashMap.get(monthName);
     }
 
-    public static ArrayList<BasicItem> getDataForMonth(int month, boolean showInfrequent) {
+    public static ArrayList<BasicItem> getDataForMonth(int month, MonthlyViewStateHolder monthlyViewStateHolder) {
         RealmQuery<BasicItem> itemRealmQuery = realm.where(BasicItem.class);
         RealmResults<BasicItem> realmResults = itemRealmQuery.findAll();
 
         TreeMap<String, Integer> monthExpensesTreeMap = new TreeMap<>();
 
         for (BasicItem basicItem : realmResults) {
-
-            if (!showInfrequent && basicItem.isInFrequent())
-                continue;
-
             String date = basicItem.getDate();
 
-
-            if (basicItem.getMonth() == month) {
+            if (basicItem.getMonth() == month && monthlyViewStateHolder.isElementIncluded(basicItem.getTag())) {
                 Integer current = monthExpensesTreeMap.get(date);
                 if (current == null) {
                     monthExpensesTreeMap.put(date, basicItem.getAmount());
@@ -579,7 +574,7 @@ public class Utils {
                 bufferedWriter.write(",");
                 bufferedWriter.write("" + basicItem.getTimestamp());
                 bufferedWriter.write(",");
-                bufferedWriter.write("" + basicItem.isInFrequent());
+                bufferedWriter.write("" + basicItem.getTag());
                 bufferedWriter.write("\n");
             }
 
@@ -699,7 +694,7 @@ public class Utils {
                 basicItem.setReason(splits[1]);
                 basicItem.setAmount(Integer.parseInt(splits[2]));
                 basicItem.setTimestamp(Long.parseLong(splits[3]));
-                basicItem.setInFrequent(Boolean.parseBoolean(splits[4].toLowerCase()));
+                basicItem.setTag(splits[4]);
 
             }
 
@@ -721,7 +716,7 @@ public class Utils {
         basicItem.setReason(givenBasicItem.getReason());
         basicItem.setAmount(givenBasicItem.getAmount());
         basicItem.setDate(givenBasicItem.getDate());
-        basicItem.setInFrequent(givenBasicItem.isInFrequent());
+        basicItem.setTag(givenBasicItem.getTag());
         realm.commitTransaction();
     }
 
@@ -775,6 +770,24 @@ public class Utils {
             sharedPreferences = context.getSharedPreferences("my_prefs", 0);
             editor = sharedPreferences.edit();
         }
+    }
+
+    public static ArrayList<String> getAllTags(){
+        RealmQuery<BasicItem> itemRealmQuery = realm.where(BasicItem.class);
+
+
+        Set<String> tagSet = new HashSet<>();
+
+        ArrayList<String> items = new ArrayList<>();
+
+        for (BasicItem basicItem : itemRealmQuery.findAll()) {
+            tagSet.add(basicItem.getTag());
+        }
+
+        items.addAll(tagSet);
+        Collections.sort(items);
+
+        return items;
     }
 
 
