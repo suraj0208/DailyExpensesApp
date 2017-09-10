@@ -2,6 +2,8 @@ package com.suraj.dailyexpenses;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -111,11 +113,18 @@ public class MainActivity extends AppCompatActivity {
         if(getIntent().getExtras()==null)
             return;
 
+        String name = getIntent().getStringExtra("name");
         int rs = getIntent().getIntExtra("rs",-1);
 
         if(rs!=-1){
             etSpentAmount.setText(""+rs);
         }
+        if(name!=null){
+            etSpendReason.setText(name);
+        }
+
+        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(965778);
     }
 
     private void initPickerViews(int day,int month) {

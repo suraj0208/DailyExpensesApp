@@ -2,7 +2,9 @@ package com.suraj.dailyexpenses;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Environment;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.suraj.dailyexpenses.data.BasicItem;
@@ -23,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.TreeMap;
 
 import io.realm.Case;
@@ -50,6 +53,8 @@ public class Utils {
 
     public static final String SDCARD_DIRECTORY = Environment.getExternalStorageDirectory() + "/DailyExpenses";
 
+    public static final String REMINDERS_SHARED_PREFERENCE_STRING = "reminders";
+
     public static Comparator<Object> dateComparator;
     public static Comparator<String> monthComparator;
 
@@ -58,6 +63,9 @@ public class Utils {
     private static Realm realm;
 
     private static Context context;
+
+    private static SharedPreferences sharedPreferences;
+    private static SharedPreferences.Editor editor;
 
     private static RealmResults<BasicItem> tempRealmResults;
 
@@ -716,6 +724,59 @@ public class Utils {
         basicItem.setInFrequent(givenBasicItem.isInFrequent());
         realm.commitTransaction();
     }
+
+    public static void putStringInSharedPreferences(String name, String value) {
+        if (context == null) {
+            Log.e("com.suraj.dailyexpenses", "context null in Utils");
+            return;
+        }
+
+        initPrefs();
+
+        editor.putString(name,value);
+        editor.apply();
+
+    }
+
+    public static void putStringSetInSharedPreferences(String name, Set<String> value) {
+        if (context == null) {
+            Log.e("com.suraj.dailyexpenses", "context null in Utils");
+            return;
+        }
+
+        initPrefs();
+        editor.putStringSet(name,value);
+        editor.apply();
+
+    }
+
+    public static Set<String> getStringSetFromSharedPreferences(String name, boolean returnRef){
+        if (context == null) {
+            Log.e("com.suraj.dailyexpenses", "context null in Utils");
+            return new HashSet<>();
+        }
+
+        initPrefs();
+
+        if(returnRef)
+            return sharedPreferences.getStringSet(name,new HashSet<String>());
+
+        return new HashSet<>(sharedPreferences.getStringSet(name,new HashSet<String>()));
+
+    }
+
+    private static void initPrefs() {
+        if (sharedPreferences == null) {
+            if (context == null) {
+                Log.e("com.suraj.dailyexpenses", "context null in Utils");
+                return;
+            }
+
+            sharedPreferences = context.getSharedPreferences("my_prefs", 0);
+            editor = sharedPreferences.edit();
+        }
+    }
+
 
 }
 

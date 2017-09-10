@@ -260,6 +260,10 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
             case R.id.action_export_monthly:
                 Utils.exportMonthlyDetails();
                 break;
+
+            case R.id.action_reminder_activity:
+                startActivity(new Intent(this, AddReminderActivity.class));
+
         }
         return super.onOptionsItemSelected(item);
     }

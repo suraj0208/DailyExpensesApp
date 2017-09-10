@@ -22,13 +22,16 @@
         <activity android:name=".MonthExpensesActivity" />
         <activity android:name=".MonthlyItemActivity" />
         <activity android:name=".PieChartActivity" />
-        <activity android:name=".EditItemActivity"/>
+        <activity android:name=".EditItemActivity" />
 
         <receiver android:name=".SMSReceiver">
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".ReminderReceiver" />
+
+        <activity android:name=".AddReminderActivity"/>
     </application>
 
 </manifest>
