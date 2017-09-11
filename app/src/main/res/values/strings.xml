@@ -63,7 +63,7 @@
 
     <string name="infrequentItem">Infrequent</string>
 
-    <string name="all">All</string>
+    <string name="action_item_tag">Tags</string>
 
     <string name="showingAllNotify">Showing all items</string>
     <string name="excludingInfrequentNotify">Excluding infrequent items</string>
@@ -85,6 +85,8 @@
     <string name="reminderNameHint">Item Name</string>
     <string name="AddReminder">Add</string>
     <string name="setReminderTimeHint">Click to set time</string>
+    <string name="tag_hint">tag</string>
+    <string name="daily_tag">Daily</string>
 
 
 </resources>

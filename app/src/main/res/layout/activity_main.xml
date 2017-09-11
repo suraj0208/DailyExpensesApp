@@ -51,8 +51,8 @@
     </FrameLayout>
 
 
-    <CheckBox
-        android:id="@+id/chkboxInfrequent"
+    <EditText
+        android:id="@+id/etTag"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
@@ -60,9 +60,8 @@
         android:layout_below="@id/tvDate"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="10dp"
-        android:text="@string/infrequentItem"
-        android:visibility="gone" />
+        android:layout_marginTop="5dp"
+        android:hint="@string/tag_hint"/>
 
     <EditText
         android:id="@+id/etSpendReason"
@@ -74,8 +73,8 @@
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginTop="5dp"
-        android:layout_toLeftOf="@id/chkboxInfrequent"
-        android:layout_toStartOf="@id/chkboxInfrequent"
+        android:layout_toLeftOf="@id/etTag"
+        android:layout_toStartOf="@id/etTag"
         android:hint="@string/spentReasonHint" />
 
     <HorizontalScrollView

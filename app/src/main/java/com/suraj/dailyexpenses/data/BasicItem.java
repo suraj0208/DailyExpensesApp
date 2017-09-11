@@ -20,6 +20,8 @@ public class BasicItem extends RealmObject implements Serializable {
     private String dayName;
     private String reason;
 
+    private String tag;
+
 
     public String getReason() {
         return reason;
@@ -38,16 +40,6 @@ public class BasicItem extends RealmObject implements Serializable {
         this.setAmount(basicItem.getAmount());
         this.setTimestamp(basicItem.getTimestamp());
     }
-
-    public boolean isInFrequent() {
-        return inFrequent;
-    }
-
-    public void setInFrequent(boolean inFrequent) {
-        this.inFrequent = inFrequent;
-    }
-
-    private boolean inFrequent;
 
     public String getDayName() {
         return dayName;
@@ -117,4 +109,11 @@ public class BasicItem extends RealmObject implements Serializable {
     }
 
 
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
 }

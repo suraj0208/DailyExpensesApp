@@ -24,18 +24,18 @@
         android:hint="@string/spentReasonAmountHint"
         android:inputType="number" />
 
-    <CheckBox
-        android:id="@+id/checkboxEditInfrequent"
+    <EditText
+        android:id="@+id/etEditTag"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/etEditItemAmount"
         android:layout_marginTop="10dp"
-        android:text="@string/infrequentItem" />
+        android:hint="@string/tag_hint" />
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/checkboxEditInfrequent"
+        android:layout_below="@id/etEditTag"
         android:layout_marginTop="10dp"
         android:background="@color/colorAccent">
 
