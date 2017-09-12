@@ -146,6 +146,10 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
 
         tags = Utils.getAllTags();
 
+        if(tags.size()==0){
+            tags.add(getString(R.string.daily_tag));
+            monthlyViewStateHolder.addElement(getString(R.string.daily_tag));
+        }
     }
 
     public void requestSelfPermission() {
@@ -305,18 +309,6 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
                 tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
             }
 
-            tv.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (monthlyViewStateHolder.isElementIncluded(tags.get(position))) {
-                        tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                        monthlyViewStateHolder.removeElement(tags.get(position));
-                    } else {
-                        tv.setPaintFlags(tv.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
-                        monthlyViewStateHolder.addElement(tags.get(position));
-                    }
-                }
-            });
 
            /* final CheckBox checkBox = (CheckBox) rowView.findViewById(R.id.checkboxTag);
 
@@ -369,12 +361,35 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
             }
         });
 
+        listViewTags.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
+                final TextView tv =(TextView) view.findViewById(R.id.tvTagName);
+
+                if (monthlyViewStateHolder.isElementIncluded(tags.get(i))) {
+                    tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                    monthlyViewStateHolder.removeElement(tags.get(i));
+                } else {
+                    tv.setPaintFlags(tv.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+                    monthlyViewStateHolder.addElement(tags.get(i));
+                }
+
+            }
+        });
+
 
     }
 
     @Override
     public void onGetView(int position, View rowView, ViewGroup parent) {
         BasicItem basicItem = basicItems.get(position);
+
+        if(!isDataAvailableForCurrentMonth()){
+            ((TextView) rowView.findViewById(R.id.tvItemName)).setText(getString(R.string.noData));
+            (rowView.findViewById(R.id.tvItemAmount)).setVisibility(View.INVISIBLE);
+            return;
+        }
+
         ((TextView) rowView.findViewById(R.id.tvItemName)).setText(basicItem.getDate());
         ((TextView) rowView.findViewById(R.id.tvItemAmount)).setText(getResources().getString(R.string.rs, basicItem.getAmount()));
     }
@@ -395,11 +410,11 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
         monthNumber = Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString());
         basicItems = Utils.getDataForMonth(monthNumber, monthlyViewStateHolder);
 
-        if (!isDataAvailableForCurrentMonth()) {
+        if(!isDataAvailableForCurrentMonth()) {
             BasicItem basicItem = new BasicItem();
-            basicItem.setReason(getString(R.string.noData));
             basicItem.setAmount(-1);
             basicItems.add(basicItem);
+            return;
         }
 
         Collections.sort(basicItems, sortingComparator);

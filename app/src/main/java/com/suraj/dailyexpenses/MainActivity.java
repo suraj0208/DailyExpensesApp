@@ -161,6 +161,10 @@ public class MainActivity extends AppCompatActivity {
 
         final List<String> tags = Utils.getAllTags();
 
+        if(tags.size()==0){
+            tags.add(getString(R.string.daily_tag));
+        }
+
         ArrayAdapter<String> itemsAdapter =
                 new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_list_item_1, tags);
 
