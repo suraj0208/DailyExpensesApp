@@ -83,10 +83,15 @@ public class BasicItem extends RealmObject implements Serializable {
         String[] splts = date.split("/");
         String[] splts1 = splts[0].split(" ");
 
+        if(splts.length < 3)
+            return;
+
+        if(splts1.length ==0)
+            return;
+
         dayName = splts1[0];
 
         day = Integer.parseInt(splts1[1]);
-
         month = Integer.parseInt(splts[1]);
         year = Integer.parseInt(splts[2]);
 
