@@ -1,7 +1,6 @@
 package com.suraj.dailyexpenses;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -19,13 +18,13 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.suraj.dailyexpenses.data.BasicItem;
 import com.suraj.dailyexpenses.data.MonthlyViewStateHolder;
+import com.suraj.dailyexpenses.widgets.TagsFilterView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -122,6 +121,7 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
                 String date = basicItems.get(i).getDate();
                 Intent intent = new Intent(MonthExpensesActivity.this, ViewExpensesActivity.class);
                 intent.putExtra(Utils.DATE_INTENT_STRING, date);
+                intent.putExtra(Utils.MONTHLY_STATE_HOLDER_INTENT_STRING,monthlyViewStateHolder);
                 startActivity(intent);
             }
         });
@@ -146,7 +146,7 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
 
         tags = Utils.getAllTags();
 
-        if(tags.size()==0){
+        if (tags.size() == 0) {
             tags.add(getString(R.string.daily_tag));
             monthlyViewStateHolder.addElement(getString(R.string.daily_tag));
         }
@@ -276,95 +276,22 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
         return super.onOptionsItemSelected(item);
     }
 
-    class TagsAdapter extends ArrayAdapter {
-        MonthlyViewStateHolder monthlyViewStateHolder;
-        List<String> tags;
-        Context context;
-
-        public TagsAdapter(Context context, List<String> tags, MonthlyViewStateHolder monthlyViewStateHolder) {
-            super(context, R.layout.tag_row);
-            this.monthlyViewStateHolder = monthlyViewStateHolder;
-            this.tags = tags;
-            this.context = context;
-        }
-
-        @Override
-        public int getCount() {
-            return tags == null ? 0 : tags.size();
-        }
-
-        @Override
-        public View getView(final int position, View convertView, ViewGroup parent) {
-            LayoutInflater inflater = (LayoutInflater) context
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-            View rowView = inflater.inflate(R.layout.tag_row, parent, false);
-
-            final TextView tv = (TextView) rowView.findViewById(R.id.tvTagName);
-            tv.setText(tags.get(position));
-
-            if (monthlyViewStateHolder.isElementIncluded(tags.get(position))) {
-                tv.setPaintFlags(tv.getPaintFlags() & Paint.STRIKE_THRU_TEXT_FLAG);
-            } else {
-                tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-            }
-
-
-           /* final CheckBox checkBox = (CheckBox) rowView.findViewById(R.id.checkboxTag);
-
-            if (monthlyViewStateHolder.isElementIncluded(tags.get(position))) {
-                checkBox.setChecked(true);
-            }
-
-
-            checkBox.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (checkBox.isChecked()) {
-                        monthlyViewStateHolder.addElement(tags.get(position));
-                    } else {
-                        monthlyViewStateHolder.removeElement(tags.get(position));
-                    }
-                }
-            });*/
-
-            return rowView;
-        }
-    }
 
     private void showTagsDialog() {
-        LayoutInflater layoutInflater = LayoutInflater.from(MonthExpensesActivity.this);
+        final TagsFilterView tagsFilterView = new TagsFilterView(this, tags, monthlyViewStateHolder);
 
-        View dialogView = layoutInflater.inflate(R.layout.dialog_tags, null);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(MonthExpensesActivity.this);
-
-        ListView listViewTags = (ListView) dialogView.findViewById(R.id.listViewTags);
-        Button btnDone = (Button) dialogView.findViewById(R.id.btnDone);
-
-        ArrayAdapter<String> itemsAdapter =
-                new TagsAdapter(this, tags, monthlyViewStateHolder);
-        //new ArrayAdapter<>(MonthExpensesActivity.this, android.R.layout.simple_list_item_1, tags);
-
-        builder.setView(dialogView);
-
-        listViewTags.setAdapter(itemsAdapter);
-
-        final AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-
-        btnDone.setOnClickListener(new View.OnClickListener() {
+        tagsFilterView.setDismissListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 displayDetailsInViews();
-                alertDialog.dismiss();
+                tagsFilterView.dismiss();
             }
         });
 
-        listViewTags.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        tagsFilterView.setTagClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
-                final TextView tv =(TextView) view.findViewById(R.id.tvTagName);
+                final TextView tv = (TextView) view.findViewById(R.id.tvTagName);
 
                 if (monthlyViewStateHolder.isElementIncluded(tags.get(i))) {
                     tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
@@ -377,6 +304,7 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
             }
         });
 
+        tagsFilterView.show();
 
     }
 
@@ -384,7 +312,7 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
     public void onGetView(int position, View rowView, ViewGroup parent) {
         BasicItem basicItem = basicItems.get(position);
 
-        if(!isDataAvailableForCurrentMonth()){
+        if (!isDataAvailableForCurrentMonth()) {
             ((TextView) rowView.findViewById(R.id.tvItemName)).setText(getString(R.string.noData));
             (rowView.findViewById(R.id.tvItemAmount)).setVisibility(View.INVISIBLE);
             return;
@@ -410,7 +338,7 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
         monthNumber = Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString());
         basicItems = Utils.getDataForMonth(monthNumber, monthlyViewStateHolder);
 
-        if(!isDataAvailableForCurrentMonth()) {
+        if (!isDataAvailableForCurrentMonth()) {
             BasicItem basicItem = new BasicItem();
             basicItem.setAmount(-1);
             basicItems.add(basicItem);

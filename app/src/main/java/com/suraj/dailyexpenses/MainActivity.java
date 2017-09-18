@@ -281,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showTodayExpenditure() {
-        tvTodayExpenditure.setText(getResources().getString(R.string.todaysExpenditure, Utils.getExpenditureForDate(tvDate.getText().toString(), true)));
+        tvTodayExpenditure.setText(getResources().getString(R.string.todaysExpenditure, Utils.getExpenditureForDate(tvDate.getText().toString(), null)));
     }
 
     private void initSaveButton() {
@@ -308,7 +308,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     Utils.saveInDatabase(tvDate.getText().toString(), reason, intAmount, tag);
-                    tvTodayExpenditure.setText(getResources().getString(R.string.todaysExpenditure, Utils.getExpenditureForDate(tvDate.getText().toString(), true)));
+                    tvTodayExpenditure.setText(getResources().getString(R.string.todaysExpenditure, Utils.getExpenditureForDate(tvDate.getText().toString(), null)));
                     etSpentAmount.setText("");
                     etSpendReason.setText("");
                 } catch (Exception ex) {
