@@ -2,6 +2,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_tags"
+        android:orderInCategory="100"
+        android:title="@string/action_item_tag"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/action_exportSpecific"
         android:orderInCategory="100"
         android:title="@string/exportSpecificDay"

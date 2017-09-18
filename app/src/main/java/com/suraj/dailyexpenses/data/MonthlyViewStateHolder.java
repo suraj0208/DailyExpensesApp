@@ -1,9 +1,10 @@
 package com.suraj.dailyexpenses.data;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
 
-public class MonthlyViewStateHolder{
+public class MonthlyViewStateHolder implements Serializable{
     private HashSet<String> currentTags;
 
     public MonthlyViewStateHolder(){

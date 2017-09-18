@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -25,12 +26,15 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.suraj.dailyexpenses.data.BasicItem;
+import com.suraj.dailyexpenses.data.MonthlyViewStateHolder;
+import com.suraj.dailyexpenses.widgets.TagsFilterView;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import uk.co.deanwild.materialshowcaseview.IShowcaseListener;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
@@ -46,6 +50,7 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
     private String date;
 
     private ArrayList<BasicItem> items;
+    private List<String> tags;
 
     private TextView tvExpenditureForDate;
     private TextView tvExpenditureForMonth;
@@ -56,12 +61,12 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
     private ListView listView;
 
     private static ViewExpensesActivity viewExpensesActivity;
+    private MonthlyViewStateHolder monthlyViewStateHolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_expenses);
-
 
         tvExpenditureForDate = (TextView) findViewById(R.id.tvExpenditureForDate);
         tvExpenditureForMonth = (TextView) findViewById(R.id.tvExpenditureForCurrentMonth);
@@ -71,14 +76,30 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
 
         listView = (ListView) findViewById(R.id.lstViewItems);
 
+        tags = Utils.getAllTags();
+
+        if (tags.size() == 0) {
+            tags.add(getString(R.string.daily_tag));
+            monthlyViewStateHolder.addElement(getString(R.string.daily_tag));
+        }
+
         Calendar calendar = Calendar.getInstance();
 
         if (getIntent().getStringExtra(Utils.DATE_INTENT_STRING) == null) {
             day = calendar.get(Calendar.DAY_OF_MONTH);
             month = calendar.get(Calendar.MONTH) + 1;
             year = calendar.get(Calendar.YEAR);
+            monthlyViewStateHolder = new MonthlyViewStateHolder();
         } else {
             date = getIntent().getStringExtra(Utils.DATE_INTENT_STRING);
+            monthlyViewStateHolder = (MonthlyViewStateHolder) getIntent().getSerializableExtra(Utils.MONTHLY_STATE_HOLDER_INTENT_STRING);
+
+            //null when coming from MainActivity
+            if (monthlyViewStateHolder == null) {
+                monthlyViewStateHolder = new MonthlyViewStateHolder();
+                monthlyViewStateHolder.addAllElements(tags);
+            }
+
             String[] splits = date.split("/");
 
             day = Integer.parseInt(splits[0].split(" ")[1]);
@@ -97,7 +118,7 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int i, long l) {
-                if(!isDataAvailableForCurrentDate())
+                if (!isDataAvailableForCurrentDate())
                     return true;
 
                 Intent intent = new Intent(ViewExpensesActivity.this, EditItemActivity.class);
@@ -110,7 +131,7 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if(!isDataAvailableForCurrentDate())
+                if (!isDataAvailableForCurrentDate())
                     return;
 
                 Intent intent = new Intent(ViewExpensesActivity.this, MonthlyItemActivity.class);
@@ -276,6 +297,9 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
         int id = item.getItemId();
 
         switch (id) {
+            case R.id.action_tags:
+                showTagsDialog();
+                break;
             case R.id.action_exportSpecific:
 
                 getInputDialogBuilder((date + ".csv").replaceAll("/", "-"))
@@ -368,7 +392,7 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
                                             bufferedWriter.write(",");
                                             bufferedWriter.write("Total");
                                             bufferedWriter.write(",");
-                                            bufferedWriter.write(""+Utils.getExpenditureForDate(prevDate,true));
+                                            bufferedWriter.write("" + Utils.getExpenditureForDate(prevDate, monthlyViewStateHolder));
                                             bufferedWriter.write("\n");
                                             bufferedWriter.write("\n");
                                             bufferedWriter.write(item.getDate());
@@ -437,7 +461,7 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
     }
 
     private void updateListView() {
-        items = Utils.getItemsForDate(date);
+        items = Utils.getItemsForDate(date, monthlyViewStateHolder);
 
         if (!isDataAvailableForCurrentDate()) {
             BasicItem basicItem = new BasicItem();
@@ -447,8 +471,8 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
         }
 
         listView.setAdapter(new BasicItemsAdapter(getApplicationContext(), items, this));
-        tvExpenditureForDate.setText("" + Utils.getExpenditureForDate(date, true));
-        tvExpenditureForMonth.setText("" + Utils.getExpensesForMonth(Integer.parseInt(date.split("/")[1]), null));
+        tvExpenditureForDate.setText("" + Utils.getExpenditureForDate(date, monthlyViewStateHolder));
+        tvExpenditureForMonth.setText("" + Utils.getExpensesForMonth(Integer.parseInt(date.split("/")[1]), monthlyViewStateHolder));
 
         btnCurrentDate.setText(day + "/" + month);
         btnCurrentMonth.setText(Utils.getMonthNameFromNumber(Integer.parseInt(date.split("/")[1])));
@@ -476,7 +500,7 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
     }
 
     private boolean isDataAvailableForCurrentDate() {
-        return items.size() >0 && items.get(0) != null && items.get(0).getAmount() != -1;
+        return items.size() > 0 && items.get(0) != null && items.get(0).getAmount() != -1;
     }
 
     private AlertDialog.Builder getInputDialogBuilder(String defaultText) {
@@ -494,5 +518,36 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
         builder.setView(view);
 
         return builder;
+    }
+
+    private void showTagsDialog() {
+        final TagsFilterView tagsFilterView = new TagsFilterView(this, tags, monthlyViewStateHolder);
+
+        tagsFilterView.setDismissListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateListView();
+                tagsFilterView.dismiss();
+            }
+        });
+
+        tagsFilterView.setTagClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
+                final TextView tv = (TextView) view.findViewById(R.id.tvTagName);
+
+                if (monthlyViewStateHolder.isElementIncluded(tags.get(i))) {
+                    tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                    monthlyViewStateHolder.removeElement(tags.get(i));
+                } else {
+                    tv.setPaintFlags(tv.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+                    monthlyViewStateHolder.addElement(tags.get(i));
+                }
+
+            }
+        });
+
+        tagsFilterView.show();
+
     }
 }

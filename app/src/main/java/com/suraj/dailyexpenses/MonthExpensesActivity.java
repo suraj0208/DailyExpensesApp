@@ -121,6 +121,7 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
                 String date = basicItems.get(i).getDate();
                 Intent intent = new Intent(MonthExpensesActivity.this, ViewExpensesActivity.class);
                 intent.putExtra(Utils.DATE_INTENT_STRING, date);
+                intent.putExtra(Utils.MONTHLY_STATE_HOLDER_INTENT_STRING,monthlyViewStateHolder);
                 startActivity(intent);
             }
         });

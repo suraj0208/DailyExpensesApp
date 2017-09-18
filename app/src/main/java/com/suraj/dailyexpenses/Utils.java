@@ -55,6 +55,7 @@ public class Utils {
     public static final String SDCARD_DIRECTORY = Environment.getExternalStorageDirectory() + "/DailyExpenses";
 
     public static final String REMINDERS_SHARED_PREFERENCE_STRING = "reminders";
+    public static final String MONTHLY_STATE_HOLDER_INTENT_STRING = "monthly_state_holder";
 
     public static Comparator<Object> dateComparator;
     public static Comparator<String> monthComparator;
@@ -243,13 +244,16 @@ public class Utils {
     }
 
 
-    public static ArrayList<BasicItem> getItemsForDate(String date) {
+    public static ArrayList<BasicItem> getItemsForDate(String date, MonthlyViewStateHolder monthlyViewStateHolder) {
         RealmQuery<BasicItem> realmQuery = realm.where(BasicItem.class).equalTo("date", date);
 
         ArrayList<BasicItem> results = new ArrayList<>();
 
-        for (BasicItem BasicItem : realmQuery.findAll()) {
-            results.add(BasicItem);
+        for (BasicItem basicItem : realmQuery.findAll()) {
+            if (monthlyViewStateHolder != null && !monthlyViewStateHolder.isElementIncluded(basicItem.getTag()))
+                continue;
+
+            results.add(basicItem);
         }
 
         Collections.sort(results, new Comparator<BasicItem>() {
@@ -262,12 +266,16 @@ public class Utils {
         return results;
     }
 
-    public static int getExpenditureForDate(String date, boolean showInfrequent) {
+    public static int getExpenditureForDate(String date, MonthlyViewStateHolder monthlyViewStateHolder) {
         int sum = 0;
-        ArrayList<BasicItem> results = getItemsForDate(date);
+        ArrayList<BasicItem> results = getItemsForDate(date,monthlyViewStateHolder);
 
-        for (BasicItem basicItem : results)
-                sum += basicItem.getAmount();
+        for (BasicItem basicItem : results) {
+            if(monthlyViewStateHolder !=null && !monthlyViewStateHolder.isElementIncluded(basicItem.getTag()))
+                continue;
+
+            sum += basicItem.getAmount();
+        }
 
         return sum;
     }
@@ -337,7 +345,7 @@ public class Utils {
 
             int currentMonth = basicItem.getMonth();
 
-            if (currentMonth == month && (  monthlyViewStateHolder == null ||  monthlyViewStateHolder.isElementIncluded(basicItem.getTag()) ) ) {
+            if (currentMonth == month && (monthlyViewStateHolder == null || monthlyViewStateHolder.isElementIncluded(basicItem.getTag()))) {
                 sum += basicItem.getAmount();
             }
         }
@@ -728,7 +736,7 @@ public class Utils {
 
         initPrefs();
 
-        editor.putString(name,value);
+        editor.putString(name, value);
         editor.apply();
 
     }
@@ -740,12 +748,12 @@ public class Utils {
         }
 
         initPrefs();
-        editor.putStringSet(name,value);
+        editor.putStringSet(name, value);
         editor.apply();
 
     }
 
-    public static Set<String> getStringSetFromSharedPreferences(String name, boolean returnRef){
+    public static Set<String> getStringSetFromSharedPreferences(String name, boolean returnRef) {
         if (context == null) {
             Log.e("com.suraj.dailyexpenses", "context null in Utils");
             return new HashSet<>();
@@ -753,10 +761,10 @@ public class Utils {
 
         initPrefs();
 
-        if(returnRef)
-            return sharedPreferences.getStringSet(name,new HashSet<String>());
+        if (returnRef)
+            return sharedPreferences.getStringSet(name, new HashSet<String>());
 
-        return new HashSet<>(sharedPreferences.getStringSet(name,new HashSet<String>()));
+        return new HashSet<>(sharedPreferences.getStringSet(name, new HashSet<String>()));
 
     }
 
@@ -772,7 +780,7 @@ public class Utils {
         }
     }
 
-    public static ArrayList<String> getAllTags(){
+    public static ArrayList<String> getAllTags() {
         RealmQuery<BasicItem> itemRealmQuery = realm.where(BasicItem.class);
 
 
