@@ -20,6 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.suraj.dailyexpenses.data.BasicItem;
@@ -121,7 +122,7 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
                 String date = basicItems.get(i).getDate();
                 Intent intent = new Intent(MonthExpensesActivity.this, ViewExpensesActivity.class);
                 intent.putExtra(Utils.DATE_INTENT_STRING, date);
-                intent.putExtra(Utils.MONTHLY_STATE_HOLDER_INTENT_STRING,monthlyViewStateHolder);
+                intent.putExtra(Utils.MONTHLY_STATE_HOLDER_INTENT_STRING, monthlyViewStateHolder);
                 startActivity(intent);
             }
         });
@@ -299,6 +300,22 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
                 } else {
                     tv.setPaintFlags(tv.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
                     monthlyViewStateHolder.addElement(tags.get(i));
+                }
+
+            }
+        });
+
+        tagsFilterView.setSwitchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Switch aSwitch = (Switch)view;
+
+                monthlyViewStateHolder.setInvertMode(!monthlyViewStateHolder.isInvertMode());
+
+                if(monthlyViewStateHolder.isInvertMode()){
+                    aSwitch.setText(getString(R.string.include_these));
+                }else{
+                    aSwitch.setText(getString(R.string.exclude_these));
                 }
 
             }

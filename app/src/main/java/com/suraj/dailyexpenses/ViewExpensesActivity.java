@@ -23,6 +23,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.suraj.dailyexpenses.data.BasicItem;
@@ -542,6 +543,22 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
                 } else {
                     tv.setPaintFlags(tv.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
                     monthlyViewStateHolder.addElement(tags.get(i));
+                }
+
+            }
+        });
+
+        tagsFilterView.setSwitchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Switch aSwitch = (Switch)view;
+
+                monthlyViewStateHolder.setInvertMode(!monthlyViewStateHolder.isInvertMode());
+
+                if(monthlyViewStateHolder.isInvertMode()){
+                    aSwitch.setText(getString(R.string.include_these));
+                }else{
+                    aSwitch.setText(getString(R.string.exclude_these));
                 }
 
             }

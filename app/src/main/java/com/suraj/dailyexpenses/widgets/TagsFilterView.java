@@ -9,6 +9,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.suraj.dailyexpenses.R;
@@ -23,8 +24,9 @@ public class TagsFilterView {
     private AlertDialog alertDialog = null;
     private final View dialogView;
     private final ListView listViewTags;
+    private final Switch aSwitch;
 
-    public TagsFilterView(Context context, List<String> tags, MonthlyViewStateHolder monthlyViewStateHolder) {
+    public TagsFilterView(final Context context, List<String> tags, final MonthlyViewStateHolder monthlyViewStateHolder) {
         this.context = context;
         this.tags = tags;
         this.monthlyViewStateHolder = monthlyViewStateHolder;
@@ -43,6 +45,16 @@ public class TagsFilterView {
         builder.setView(dialogView);
 
         listViewTags.setAdapter(itemsAdapter);
+
+        aSwitch = (Switch)dialogView.findViewById(R.id.switchInclude);
+
+        if(monthlyViewStateHolder.isInvertMode()){
+            aSwitch.setText(context.getString(R.string.include_these));
+            aSwitch.setChecked(true);
+        }else{
+            aSwitch.setText(context.getString(R.string.exclude_these));
+            aSwitch.setChecked(false);
+        }
 
         alertDialog = builder.create();
 
@@ -63,5 +75,9 @@ public class TagsFilterView {
 
     public void setTagClickListener(AdapterView.OnItemClickListener tagClickListener){
         listViewTags.setOnItemClickListener(tagClickListener);
+    }
+
+    public void setSwitchClickListener(View.OnClickListener switchClickListener){
+        aSwitch.setOnClickListener(switchClickListener);
     }
 }

@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
 
         ListView listViewTags = (ListView) dialogView.findViewById(R.id.listViewTags);
 
-        dialogView.findViewById(R.id.btnDone).setVisibility(View.GONE);
+        dialogView.findViewById(R.id.ll_tags_controls).setVisibility(View.GONE);
 
         final List<String> tags = Utils.getAllTags();
 

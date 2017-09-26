@@ -250,7 +250,7 @@ public class Utils {
         ArrayList<BasicItem> results = new ArrayList<>();
 
         for (BasicItem basicItem : realmQuery.findAll()) {
-            if (monthlyViewStateHolder != null && !monthlyViewStateHolder.isElementIncluded(basicItem.getTag()))
+            if (monthlyViewStateHolder != null && monthlyViewStateHolder.isElementIncluded(basicItem.getTag()) == monthlyViewStateHolder.isInvertMode())
                 continue;
 
             results.add(basicItem);
@@ -268,10 +268,10 @@ public class Utils {
 
     public static int getExpenditureForDate(String date, MonthlyViewStateHolder monthlyViewStateHolder) {
         int sum = 0;
-        ArrayList<BasicItem> results = getItemsForDate(date,monthlyViewStateHolder);
+        ArrayList<BasicItem> results = getItemsForDate(date, monthlyViewStateHolder);
 
         for (BasicItem basicItem : results) {
-            if(monthlyViewStateHolder !=null && !monthlyViewStateHolder.isElementIncluded(basicItem.getTag()))
+            if (monthlyViewStateHolder != null && monthlyViewStateHolder.isElementIncluded(basicItem.getTag()) == monthlyViewStateHolder.isInvertMode())
                 continue;
 
             sum += basicItem.getAmount();
@@ -345,10 +345,13 @@ public class Utils {
 
             int currentMonth = basicItem.getMonth();
 
-            if (currentMonth == month && (monthlyViewStateHolder == null || monthlyViewStateHolder.isElementIncluded(basicItem.getTag()))) {
-                sum += basicItem.getAmount();
-            }
+            if (currentMonth != month || (monthlyViewStateHolder != null && monthlyViewStateHolder.isElementIncluded(basicItem.getTag()) == monthlyViewStateHolder.isInvertMode()))
+                continue;
+
+            sum += basicItem.getAmount();
+
         }
+
         return sum;
     }
 
@@ -385,7 +388,9 @@ public class Utils {
         for (BasicItem basicItem : realmResults) {
             String date = basicItem.getDate();
 
-            if (basicItem.getMonth() == month && monthlyViewStateHolder.isElementIncluded(basicItem.getTag())) {
+            if (basicItem.getMonth() != month || (monthlyViewStateHolder != null && monthlyViewStateHolder.isElementIncluded(basicItem.getTag()) == monthlyViewStateHolder.isInvertMode()))
+                continue;
+
                 Integer current = monthExpensesTreeMap.get(date);
                 if (current == null) {
                     monthExpensesTreeMap.put(date, basicItem.getAmount());
@@ -393,7 +398,7 @@ public class Utils {
                     monthExpensesTreeMap.put(date, current + basicItem.getAmount());
                 }
 
-            }
+
         }
 
         ArrayList<BasicItem> basicItems = new ArrayList<>();

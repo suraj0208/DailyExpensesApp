@@ -87,6 +87,9 @@
     <string name="setReminderTimeHint">Click to set time</string>
     <string name="tag_hint">tag</string>
     <string name="daily_tag">Daily</string>
+    <string name="done">Done</string>
+    <string name="include_these">Include striked</string>
+    <string name="exclude_these">Exclude striked</string>
 
 
 </resources>

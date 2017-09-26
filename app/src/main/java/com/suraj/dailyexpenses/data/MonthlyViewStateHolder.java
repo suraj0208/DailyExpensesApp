@@ -7,6 +7,8 @@ import java.util.HashSet;
 public class MonthlyViewStateHolder implements Serializable{
     private HashSet<String> currentTags;
 
+    private boolean invert = false;
+
     public MonthlyViewStateHolder(){
         currentTags = new HashSet<>();
     }
@@ -25,6 +27,14 @@ public class MonthlyViewStateHolder implements Serializable{
 
     public boolean isElementIncluded(String element){
         return currentTags.contains(element);
+    }
+
+    public boolean isInvertMode() {
+        return invert;
+    }
+
+    public void setInvertMode(boolean invert) {
+        this.invert = invert;
     }
 
 }

@@ -9,15 +9,38 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <Button
-        android:id="@+id/btnDone"
-        style="?android:attr/buttonBarButtonStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:maxLines="2"
-        android:text="Done"
-        android:layout_gravity="end"
-        android:textAppearance="?android:attr/textAppearanceListItemSmall"
-        android:textColor="@android:color/background_dark" />
+    <LinearLayout
+        android:id="@+id/ll_tags_controls"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:orientation="horizontal">
+
+        <Switch
+            android:id="@+id/switchInclude"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="start"
+            android:maxLines="2"
+            android:text="@string/exclude_these"
+            android:textAppearance="?android:attr/textAppearanceListItemSmall"
+            android:textColor="@android:color/background_dark" />
+
+        <Button
+            android:id="@+id/btnDone"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:maxLines="2"
+            android:text="@string/done"
+            android:textAppearance="?android:attr/textAppearanceListItemSmall"
+            android:textColor="@android:color/background_dark" />
+
+    </LinearLayout>
+
 
 </LinearLayout>
