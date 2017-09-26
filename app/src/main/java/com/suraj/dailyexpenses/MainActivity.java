@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -131,11 +132,7 @@ public class MainActivity extends AppCompatActivity {
                     showTagsDialog();
                 }
 
-                if (b) {
-                    prevFocus.bool = true;
-                } else {
-                    prevFocus.bool = false;
-                }
+                prevFocus.bool = b;
 
             }
         });
@@ -161,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
 
         final List<String> tags = Utils.getAllTags();
 
-        if(tags.size()==0){
+        if (tags.size() == 0) {
             tags.add(getString(R.string.daily_tag));
         }
 
@@ -181,6 +178,13 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 etTag.setText(tags.get(i));
                 alertDialog.dismiss();
+            }
+        });
+
+        alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                etTag.setSelection(etTag.getText().length());
             }
         });
     }
