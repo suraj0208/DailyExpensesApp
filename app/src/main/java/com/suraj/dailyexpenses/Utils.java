@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.suraj.dailyexpenses.data.BasicItem;
 import com.suraj.dailyexpenses.data.MonthlyViewStateHolder;
+import com.suraj.dailyexpenses.data.TagItemsHolder;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -125,6 +126,36 @@ public class Utils {
                 case 3:
                     return b2.getAmount() - b1.getAmount();
 
+            }
+
+            return 0;
+        }
+
+        public void setType(int type) {
+            this.type = type;
+        }
+    }
+
+    static class TagsComparator implements Comparator<TagItemsHolder> {
+        public int getType() {
+            return type;
+        }
+
+        private int type = 0;
+
+        /**
+         * 0 amount a-z
+         * 1 amount z-a
+         */
+
+        @Override
+        public int compare(TagItemsHolder b1, TagItemsHolder b2) {
+            switch (type) {
+                case 0:
+                    return b1.getSum() - b2.getSum();
+
+                case 1:
+                    return b2.getSum() - b1.getSum();
             }
 
             return 0;
@@ -400,12 +431,12 @@ public class Utils {
             if (basicItem.getMonth() != month || (monthlyViewStateHolder != null && monthlyViewStateHolder.isElementIncluded(basicItem.getTag()) == monthlyViewStateHolder.isInvertMode()))
                 continue;
 
-                Integer current = monthExpensesTreeMap.get(date);
-                if (current == null) {
-                    monthExpensesTreeMap.put(date, basicItem.getAmount());
-                } else {
-                    monthExpensesTreeMap.put(date, current + basicItem.getAmount());
-                }
+            Integer current = monthExpensesTreeMap.get(date);
+            if (current == null) {
+                monthExpensesTreeMap.put(date, basicItem.getAmount());
+            } else {
+                monthExpensesTreeMap.put(date, current + basicItem.getAmount());
+            }
 
 
         }
@@ -797,7 +828,6 @@ public class Utils {
     public static ArrayList<String> getAllTags() {
         RealmQuery<BasicItem> itemRealmQuery = realm.where(BasicItem.class);
 
-
         Set<String> tagSet = new HashSet<>();
 
         ArrayList<String> items = new ArrayList<>();
@@ -856,6 +886,38 @@ public class Utils {
 
         return true;
     }
+
+    public static List<TagItemsHolder> getTagData(int monthNumber) {
+        RealmQuery<BasicItem> itemRealmQuery;
+
+        if(monthNumber <=0)
+            itemRealmQuery = realm.where(BasicItem.class);
+        else
+            itemRealmQuery = realm.where(BasicItem.class).equalTo("month",monthNumber);
+
+        HashMap<String, TagItemsHolder> tagItemsHoldersHashMap = new HashMap<>();
+
+        for (BasicItem basicItem : itemRealmQuery.findAll()) {
+            TagItemsHolder tagItemsHolder = tagItemsHoldersHashMap.get(basicItem.getTag());
+
+            if (tagItemsHolder == null) {
+                tagItemsHolder = new TagItemsHolder(basicItem.getTag());
+                tagItemsHoldersHashMap.put(basicItem.getTag(),tagItemsHolder);
+            }
+
+            tagItemsHolder.addToList(basicItem);
+            tagItemsHolder.addToSum(basicItem.getAmount());
+
+        }
+
+        List<TagItemsHolder> tagItemsHolders = new ArrayList<>();
+
+        for(String key:tagItemsHoldersHashMap.keySet())
+            tagItemsHolders.add(tagItemsHoldersHashMap.get(key));
+
+        return tagItemsHolders;
+    }
+
 
 }
 

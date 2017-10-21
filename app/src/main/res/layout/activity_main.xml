@@ -332,7 +332,7 @@
         android:layout_below="@id/llAmounts"
         android:layout_marginTop="30dp"
         android:orientation="horizontal"
-        android:weightSum="2">
+        android:weightSum="3">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -362,6 +362,27 @@
                 android:layout_marginTop="5dp"
                 android:text="@string/viewMonth" />
 
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btnBrowseTags"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/ic_tag" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/btnBrowseTags"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="5dp"
+                android:text="@string/browseTags" />
         </RelativeLayout>
 
         <RelativeLayout

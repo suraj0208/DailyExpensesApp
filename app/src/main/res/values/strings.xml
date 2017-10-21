@@ -90,6 +90,7 @@
     <string name="done">Done</string>
     <string name="include_these">Include striked</string>
     <string name="exclude_these">Exclude striked</string>
+    <string name="browseTags">View\nTags</string>
 
 
 </resources>

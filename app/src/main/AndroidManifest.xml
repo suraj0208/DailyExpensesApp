@@ -31,7 +31,8 @@
         </receiver>
         <receiver android:name=".ReminderReceiver" />
 
-        <activity android:name=".AddReminderActivity"/>
+        <activity android:name=".AddReminderActivity" />
+        <activity android:name=".BrowseTagsActivity"></activity>
     </application>
 
 </manifest>
