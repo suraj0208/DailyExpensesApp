@@ -3,6 +3,7 @@ package com.suraj.dailyexpenses;
 import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -160,7 +161,7 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
         ensureSingleInstanceOnActivityStack();
 
         showTipsForButtons();
-        requestSelfPermission();
+        Utils.requestSelfPermission(this);
 
     }
 
@@ -303,21 +304,21 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
                 break;
             case R.id.action_exportSpecific:
 
-                getInputDialogBuilder((date + ".csv").replaceAll("/", "-"))
+                Utils.getInputDialogBuilder(this,(date + ".csv").replaceAll("/", "-"))
                         .setTitle(getResources().getString(R.string.enterFileName))
                         .setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                requestSelfPermission();
+                                Utils.requestSelfPermission(ViewExpensesActivity.this);
                                 try {
                                     String fileName = ((EditText) ((AlertDialog) dialogInterface).findViewById(R.id.etFileName)).getText().toString();
 
                                     if (fileName.length() == 0)
                                         return;
 
-                                    fileName = getFileName(fileName);
+                                    fileName = Utils.makeCSVFileName(fileName);
 
-                                    if (!checkDir())
+                                    if (!Utils.checkDir())
                                         return;
 
                                     FileWriter fileWriter = new FileWriter(new File(Utils.SDCARD_DIRECTORY + "/" + fileName));
@@ -348,117 +349,9 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
                         .show();
 
                 return true;
-
-            case R.id.action_exportEntire:
-                Calendar calendar = Calendar.getInstance();
-
-                String date = Utils.getDayOfWeekString(calendar.get(Calendar.DAY_OF_WEEK))
-                        + " " + calendar.get(Calendar.DAY_OF_MONTH) + "-" + (calendar.get(Calendar.MONTH) + 1) + "-" + calendar.get(Calendar.YEAR);
-
-                date += "-all";
-
-                getInputDialogBuilder(date + ".csv")
-                        .setTitle(getResources().getString(R.string.enterFileName))
-                        .setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                requestSelfPermission();
-
-                                try {
-                                    String fileName = ((EditText) ((AlertDialog) dialogInterface).findViewById(R.id.etFileName)).getText().toString();
-
-                                    if (fileName.length() == 0)
-                                        return;
-
-                                    fileName = getFileName(fileName);
-
-                                    if (!checkDir())
-                                        return;
-
-
-                                    FileWriter fileWriter = new FileWriter(new File(Utils.SDCARD_DIRECTORY + "/" + fileName));
-                                    BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-
-                                    bufferedWriter.write("Date");
-                                    bufferedWriter.write(",");
-                                    bufferedWriter.write("Item");
-                                    bufferedWriter.write(",");
-                                    bufferedWriter.write("Amount ( Rs )");
-                                    bufferedWriter.write("\n");
-
-                                    String prevDate = null;
-
-                                    for (BasicItem item : Utils.getAllItemsFromDatabase()) {
-                                        if (!item.getDate().equals(prevDate)) {
-                                            bufferedWriter.write(",");
-                                            bufferedWriter.write("Total");
-                                            bufferedWriter.write(",");
-                                            bufferedWriter.write("" + Utils.getExpenditureForDate(prevDate, monthlyViewStateHolder));
-                                            bufferedWriter.write("\n");
-                                            bufferedWriter.write("\n");
-                                            bufferedWriter.write(item.getDate());
-                                        } else {
-                                            bufferedWriter.write("");
-                                        }
-                                        bufferedWriter.write(",");
-                                        bufferedWriter.write(item.getReason());
-                                        bufferedWriter.write(",");
-                                        bufferedWriter.write("" + item.getAmount());
-                                        bufferedWriter.write("\n");
-                                        prevDate = item.getDate();
-                                    }
-
-                                    bufferedWriter.close();
-                                    fileWriter.close();
-                                    Utils.showToast(getString(R.string.exportSuccessfulNotify));
-
-
-                                } catch (Exception ex) {
-                                    ex.printStackTrace();
-                                }
-
-                            }
-                        })
-                        .setNegativeButton(getResources().getString(R.string.cancel), null)
-                        .show();
-                return true;
-
-            case R.id.action_backup:
-                requestSelfPermission();
-                Utils.backup();
-                return true;
-
-            case R.id.action_restore:
-                requestSelfPermission();
-                Utils.restore(true);
-                return true;
-
-
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private String getFileName(String fileName) {
-        fileName = fileName.replaceAll("/", "-");
-
-        if (!fileName.endsWith(".csv")) {
-            fileName = fileName + ".csv";
-        }
-
-        return fileName;
-    }
-
-    private boolean checkDir() {
-        File dir = new File(Utils.SDCARD_DIRECTORY);
-
-        if (!dir.exists())
-            if (!dir.mkdirs()) {
-                Utils.showToast(getResources().getString(R.string.error));
-                return false;
-            }
-
-        return true;
     }
 
     private void updateListView() {
@@ -494,32 +387,10 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
         }
     }
 
-    public void requestSelfPermission() {
-        if (ContextCompat.checkSelfPermission(ViewExpensesActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(ViewExpensesActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
-        }
-    }
-
     private boolean isDataAvailableForCurrentDate() {
         return items.size() > 0 && items.get(0) != null && items.get(0).getAmount() != -1;
     }
 
-    private AlertDialog.Builder getInputDialogBuilder(String defaultText) {
-        LayoutInflater layoutInflater = LayoutInflater.from(this);
-
-        View view = layoutInflater.inflate(R.layout.dialog_view, null);
-
-        EditText etFileName = (EditText) view.findViewById(R.id.etFileName);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        etFileName.setInputType(InputType.TYPE_CLASS_TEXT);
-
-        etFileName.setText(defaultText);
-
-        builder.setView(view);
-
-        return builder;
-    }
 
     private void showTagsDialog() {
         final TagsFilterView tagsFilterView = new TagsFilterView(this, tags, monthlyViewStateHolder);

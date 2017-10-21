@@ -1,10 +1,19 @@
 package com.suraj.dailyexpenses;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
+import android.text.InputType;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.suraj.dailyexpenses.data.BasicItem;
@@ -803,6 +812,50 @@ public class Utils {
         return items;
     }
 
+    public static AlertDialog.Builder getInputDialogBuilder(Context context, String defaultText) {
+        LayoutInflater layoutInflater = LayoutInflater.from(context);
+
+        View view = layoutInflater.inflate(R.layout.dialog_view, null);
+
+        EditText etFileName = (EditText) view.findViewById(R.id.etFileName);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        etFileName.setInputType(InputType.TYPE_CLASS_TEXT);
+
+        etFileName.setText(defaultText);
+
+        builder.setView(view);
+
+        return builder;
+    }
+
+    public static void requestSelfPermission(Activity activity) {
+        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+        }
+    }
+
+    public static String makeCSVFileName(String fileName) {
+        fileName = fileName.replaceAll("/", "-");
+
+        if (!fileName.endsWith(".csv")) {
+            fileName = fileName + ".csv";
+        }
+
+        return fileName;
+    }
+
+    public static boolean checkDir() {
+        File dir = new File(Utils.SDCARD_DIRECTORY);
+
+        if (!dir.exists())
+            if (!dir.mkdirs()) {
+                Utils.showToast(context.getResources().getString(R.string.error));
+                return false;
+            }
+
+        return true;
+    }
 
 }
 

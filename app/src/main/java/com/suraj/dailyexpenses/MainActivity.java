@@ -12,6 +12,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -24,6 +26,11 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.suraj.dailyexpenses.data.BasicItem;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
@@ -483,6 +490,108 @@ public class MainActivity extends AppCompatActivity {
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.action_exportEntire:
+                Calendar calendar = Calendar.getInstance();
+
+                String date = Utils.getDayOfWeekString(calendar.get(Calendar.DAY_OF_WEEK))
+                        + " " + calendar.get(Calendar.DAY_OF_MONTH) + "-" + (calendar.get(Calendar.MONTH) + 1) + "-" + calendar.get(Calendar.YEAR);
+
+                date += "-all";
+
+                Utils.getInputDialogBuilder(this,date + ".csv")
+                        .setTitle(getResources().getString(R.string.enterFileName))
+                        .setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Utils.requestSelfPermission(MainActivity.this);
+
+                                try {
+                                    String fileName = ((EditText) ((AlertDialog) dialogInterface).findViewById(R.id.etFileName)).getText().toString();
+
+                                    if (fileName.length() == 0)
+                                        return;
+
+                                    fileName = Utils.makeCSVFileName(fileName);
+
+                                    if (!Utils.checkDir())
+                                        return;
+
+
+                                    FileWriter fileWriter = new FileWriter(new File(Utils.SDCARD_DIRECTORY + "/" + fileName));
+                                    BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+
+                                    bufferedWriter.write("Date");
+                                    bufferedWriter.write(",");
+                                    bufferedWriter.write("Item");
+                                    bufferedWriter.write(",");
+                                    bufferedWriter.write("Amount ( Rs )");
+                                    bufferedWriter.write("\n");
+
+                                    String prevDate = null;
+
+                                    for (BasicItem item : Utils.getAllItemsFromDatabase()) {
+                                        if (!item.getDate().equals(prevDate)) {
+                                            bufferedWriter.write(",");
+                                            bufferedWriter.write("Total");
+                                            bufferedWriter.write(",");
+                                            bufferedWriter.write("" + Utils.getExpenditureForDate(prevDate, null));
+                                            bufferedWriter.write("\n");
+                                            bufferedWriter.write("\n");
+                                            bufferedWriter.write(item.getDate());
+                                        } else {
+                                            bufferedWriter.write("");
+                                        }
+                                        bufferedWriter.write(",");
+                                        bufferedWriter.write(item.getReason());
+                                        bufferedWriter.write(",");
+                                        bufferedWriter.write("" + item.getAmount());
+                                        bufferedWriter.write("\n");
+                                        prevDate = item.getDate();
+                                    }
+
+                                    bufferedWriter.close();
+                                    fileWriter.close();
+                                    Utils.showToast(getString(R.string.exportSuccessfulNotify));
+
+
+                                } catch (Exception ex) {
+                                    ex.printStackTrace();
+                                }
+
+                            }
+                        })
+                        .setNegativeButton(getResources().getString(R.string.cancel), null)
+                        .show();
+                return true;
+
+            case R.id.action_backup:
+                Utils.requestSelfPermission(MainActivity.this);
+                Utils.backup();
+                return true;
+
+            case R.id.action_restore:
+                Utils.requestSelfPermission(MainActivity.this);
+                Utils.restore(true);
+                return true;
+
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
 
 
 }

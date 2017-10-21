@@ -12,23 +12,6 @@
         android:orderInCategory="100"
         android:title="@string/exportSpecificDay"
         app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_exportEntire"
-        android:orderInCategory="100"
-        android:title="@string/exportDatabase"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_backup"
-        android:orderInCategory="100"
-        android:title="Backup"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_restore"
-        android:orderInCategory="100"
-        android:title="Restore"
-        app:showAsAction="never" />
+    
 
 </menu>
