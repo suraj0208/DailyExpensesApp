@@ -1,16 +1,13 @@
 package com.suraj.dailyexpenses.widgets;
 
 import android.content.Context;
-import android.graphics.Paint;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Switch;
-import android.widget.TextView;
 
 import com.suraj.dailyexpenses.R;
 import com.suraj.dailyexpenses.data.MonthlyViewStateHolder;
@@ -46,12 +43,12 @@ public class TagsFilterView {
 
         listViewTags.setAdapter(itemsAdapter);
 
-        aSwitch = (Switch)dialogView.findViewById(R.id.switchInclude);
+        aSwitch = (Switch) dialogView.findViewById(R.id.switchInclude);
 
-        if(monthlyViewStateHolder.isInvertMode()){
+        if (monthlyViewStateHolder.isInvertMode()) {
             aSwitch.setText(context.getString(R.string.include_these));
             aSwitch.setChecked(true);
-        }else{
+        } else {
             aSwitch.setText(context.getString(R.string.exclude_these));
             aSwitch.setChecked(false);
         }
@@ -60,24 +57,28 @@ public class TagsFilterView {
 
     }
 
-    public void dismiss(){
+    public void dismiss() {
         alertDialog.dismiss();
     }
 
-    public void show(){
+    public void show() {
         alertDialog.show();
     }
 
-    public void setDismissListener(View.OnClickListener dismissListner){
+    public void setDismissListener(View.OnClickListener dismissListner) {
         Button btnDone = (Button) dialogView.findViewById(R.id.btnDone);
         btnDone.setOnClickListener(dismissListner);
     }
 
-    public void setTagClickListener(AdapterView.OnItemClickListener tagClickListener){
+    public void setTagClickListener(AdapterView.OnItemClickListener tagClickListener) {
         listViewTags.setOnItemClickListener(tagClickListener);
     }
 
-    public void setSwitchClickListener(View.OnClickListener switchClickListener){
+    public void setSwitchClickListener(View.OnClickListener switchClickListener) {
         aSwitch.setOnClickListener(switchClickListener);
+    }
+
+    public void setSwitchEnabled(boolean enabled) {
+        aSwitch.setEnabled(enabled);
     }
 }

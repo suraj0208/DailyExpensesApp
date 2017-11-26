@@ -18,4 +18,10 @@
         android:orderInCategory="100"
         android:title="Restore"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_stats"
+        android:title="Stats"
+        app:showAsAction="never" />
+
 </menu>

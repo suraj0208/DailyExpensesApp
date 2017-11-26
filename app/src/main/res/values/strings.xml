@@ -91,6 +91,14 @@
     <string name="include_these">Include striked</string>
     <string name="exclude_these">Exclude striked</string>
     <string name="browseTags">View\nTags</string>
+    <string name="title_activity_stats">StatsActivity</string>
+    <string name="title_activity_main2">Main2Activity</string>
 
+
+    <!--stats -->
+    <string name="daily_average_string">Rs. %1$s is average expenditure per day.</string>
+    <string name="most_expensive_string">%1$s is the most expensive item, costs Rs. %2$s.</string>
+    <string name="week_expense_string">Spent in %1$s week: Rs. %2$s</string>
+    <string name="weekend_expense_string">Spent in %1$s weekend: Rs. %2$s</string>
 
 </resources>

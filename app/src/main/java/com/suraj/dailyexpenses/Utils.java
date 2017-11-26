@@ -81,6 +81,17 @@ public class Utils {
 
     private static RealmResults<BasicItem> tempRealmResults;
 
+    public static List<BasicItem> getAllItemsForMonth(int month) {
+        RealmQuery<BasicItem> itemRealmQuery = realm.where(BasicItem.class).equalTo("month",month);
+
+        ArrayList<BasicItem> items = new ArrayList<>();
+        items.addAll(itemRealmQuery.findAll());
+
+        Collections.sort(items, dateComparator);
+
+        return items;
+    }
+
     static class SortingComparator implements Comparator<BasicItem> {
         public int getType() {
             return type;
@@ -449,6 +460,9 @@ public class Utils {
             basicItem.setAmount(monthExpensesTreeMap.get(date));
             basicItems.add(basicItem);
         }
+
+        Collections.sort(basicItems,dateComparator);
+
         return basicItems;
 
     }

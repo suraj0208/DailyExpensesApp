@@ -593,6 +593,9 @@ public class MainActivity extends AppCompatActivity {
                 Utils.restore(true);
                 return true;
 
+            case R.id.action_stats:
+                startActivity(new Intent(MainActivity.this, StatsActivity.class));
+
         }
 
         return super.onOptionsItemSelected(item);
