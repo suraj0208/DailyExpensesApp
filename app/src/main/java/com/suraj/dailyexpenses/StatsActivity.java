@@ -16,9 +16,7 @@ import com.suraj.dailyexpenses.widgets.TagsFilterView;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class StatsActivity extends AppCompatActivity {
     private List<BasicItem> basicItems;
@@ -27,10 +25,13 @@ public class StatsActivity extends AppCompatActivity {
     private TextView tvWeeklyExpenses;
     private TextView tvWeekendDetails;
     private Spinner spinMonths;
+    private Spinner spinYear;
     private MonthlyViewStateHolder monthlyViewStateHolder;
     private Button btnSettings;
     private TagsFilterView tagsFilterView;
     private List<String> tags;
+    private int month;
+    private int year;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,22 +44,13 @@ public class StatsActivity extends AppCompatActivity {
 
         initViews();
 
-        final ArrayList<String> monthList = Utils.getMonthsFromDatabase();
-        Collections.sort(monthList, Utils.monthComparator);
-        spinMonths.setAdapter(new ArrayAdapter<>(StatsActivity.this, android.R.layout.simple_spinner_dropdown_item, monthList));
+        month = getIntent().getIntExtra(Utils.MONTH_NUMBER_INTENT_STRING, -1);
+        year = getIntent().getIntExtra(Utils.YEAR_INTENT_STRING, -1);
 
-        spinMonths.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                int month = Utils.getMonthNumberFromString(monthList.get(i));
-                displayStatsForMonth(month);
-            }
+        initSpinners();
 
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
+        month = Utils.getMonthNumberFromString(spinMonths.getSelectedItem().toString());
+        year = Integer.parseInt(spinYear.getSelectedItem().toString());
 
         btnSettings.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,16 +60,73 @@ public class StatsActivity extends AppCompatActivity {
         });
 
         //To Do: Handle month list empty condition here
-        displayStatsForMonth(Utils.getMonthNumberFromString(spinMonths.getSelectedItem().toString()));
+        displayStatsForMonth();
 
     }
 
-    private void displayStatsForMonth(int month) {
+    private void initSpinners() {
+        int i;
+
+        final ArrayList<String> monthList = Utils.getMonthsFromDatabase();
+        Collections.sort(monthList, Utils.monthComparator);
+        spinMonths.setAdapter(new ArrayAdapter<>(StatsActivity.this, android.R.layout.simple_spinner_dropdown_item, monthList));
+
+        spinMonths.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                month = Utils.getMonthNumberFromString(monthList.get(i));
+                displayStatsForMonth();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        i = monthList.indexOf(Utils.getMonthNameFromNumber(month));
+
+        if (i != -1) {
+            spinMonths.setSelection(i);
+        }
+
+        final ArrayList<String> yearList = Utils.getYearsFromDatabase();
+        Collections.sort(yearList);
+        spinYear.setAdapter(new ArrayAdapter<>(StatsActivity.this, android.R.layout.simple_spinner_dropdown_item, yearList));
+
+        spinYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                year = Integer.parseInt(yearList.get(i));
+                displayStatsForMonth();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        i = yearList.indexOf("" + year);
+
+        if (i != -1) {
+            spinYear.setSelection(i);
+        }
+
+    }
+
+    private void displayStatsForMonth() {
 
         /*
         Average
          */
-        basicItems = Utils.getDataForMonth(month, monthlyViewStateHolder);
+        basicItems = Utils.getDataForMonth(month, year, monthlyViewStateHolder);
+
+        if (basicItems.size() == 0) {
+            tvDailyAverage.setText("No data available");
+            return;
+        }
+
         tvDailyAverage.setText(getString(R.string.daily_average_string, getDailyAverage(basicItems)));
 
 
@@ -124,7 +173,8 @@ public class StatsActivity extends AppCompatActivity {
 
     private void initViews() {
         spinMonths = (Spinner) findViewById(R.id.stat_month_spinner);
-        btnSettings = (Button)findViewById(R.id.btn_stat_setting);
+        spinYear = (Spinner) findViewById(R.id.stat_year_spinner);
+        btnSettings = (Button) findViewById(R.id.btn_stat_setting);
 
         tvDailyAverage = (TextView) findViewById(R.id.tv_daily_average);
         tvMostExpensive = (TextView) findViewById(R.id.tv_most_expensive);
@@ -136,7 +186,7 @@ public class StatsActivity extends AppCompatActivity {
         tagsFilterView.setDismissListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                displayStatsForMonth(Utils.getMonthNumberFromString(spinMonths.getSelectedItem().toString()));
+                displayStatsForMonth();
                 tagsFilterView.dismiss();
             }
         });

@@ -5,8 +5,12 @@ import java.util.Collection;
 import java.util.HashSet;
 
 public class MonthlyViewStateHolder implements Serializable{
-    private HashSet<String> currentTags;
+    public HashSet<String> getCurrentTags() {
+        return currentTags;
+    }
 
+    private HashSet<String> currentTags;
+    //exclude mode  - false, include mode - true
     private boolean invert = false;
 
     public MonthlyViewStateHolder(){

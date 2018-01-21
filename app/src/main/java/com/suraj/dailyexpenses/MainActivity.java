@@ -11,22 +11,21 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.suraj.dailyexpenses.data.BasicItem;
+import com.suraj.dailyexpenses.data.MonthlyViewStateHolder;
+import com.suraj.dailyexpenses.widgets.TagSelectorView;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -63,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Utils.initRealm(getApplicationContext());
 
         commonReasons = new HashSet<>();
 
@@ -75,13 +75,14 @@ public class MainActivity extends AppCompatActivity {
         etSpentAmount = (EditText) findViewById(R.id.etSpentAmount);
 
         etTag = (EditText) findViewById(R.id.etTag);
-        etTag.setText(R.string.daily_tag);
+        etTag.setText(Utils.DEFAULT_TAG_NAME);
 
         initReasonViews();
         initTagViews();
         initAmountViews();
         initSaveButton();
         initViewButtons();
+        loadSettings();
 
         btnSetDate = (Button) findViewById(R.id.btnSetDate);
         btnSetDate.setOnClickListener(new View.OnClickListener() {
@@ -101,7 +102,6 @@ public class MainActivity extends AppCompatActivity {
 
         showDateOnTextView(calendar.get(Calendar.DAY_OF_WEEK), year, month + 1, day);
 
-        Utils.initRealm(getApplicationContext());
         showTodayExpenditure();
         setupTips();
 
@@ -124,7 +124,30 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void loadSettings() {
+        etTag.setText(Utils.getSharedPreferences().getString(Utils.SETTINGS_DEFAULT_TAG, Utils.DEFAULT_TAG_NAME));
+    }
+
     private void initTagViews() {
+        final List<String> tags = Utils.getAllTags();
+        MonthlyViewStateHolder monthlyViewStateHolder = new MonthlyViewStateHolder();
+        final TagSelectorView tagSelectorView = new TagSelectorView(MainActivity.this, tags, monthlyViewStateHolder);
+
+        tagSelectorView.setTagClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                etTag.setText(tags.get(i));
+                tagSelectorView.dismiss();
+            }
+        });
+
+        tagSelectorView.setDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                etTag.setSelection(etTag.getText().length());
+            }
+        });
+
         class BooleanHolder {
             boolean bool;
         }
@@ -136,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
             public void onFocusChange(View view, boolean b) {
 
                 if (!prevFocus.bool) {
-                    showTagsDialog();
+                    tagSelectorView.show();
                 }
 
                 prevFocus.bool = b;
@@ -147,51 +170,7 @@ public class MainActivity extends AppCompatActivity {
         etTag.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showTagsDialog();
-            }
-        });
-    }
-
-    public void showTagsDialog() {
-        LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
-
-        View dialogView = layoutInflater.inflate(R.layout.dialog_tags, null);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-
-        ListView listViewTags = (ListView) dialogView.findViewById(R.id.listViewTags);
-
-        dialogView.findViewById(R.id.ll_tags_controls).setVisibility(View.GONE);
-
-        final List<String> tags = Utils.getAllTags();
-
-        if (tags.size() == 0) {
-            tags.add(getString(R.string.daily_tag));
-        }
-
-        ArrayAdapter<String> itemsAdapter =
-                new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_list_item_1, tags);
-
-        builder.setView(dialogView);
-
-        listViewTags.setAdapter(itemsAdapter);
-
-
-        final AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-
-        listViewTags.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                etTag.setText(tags.get(i));
-                alertDialog.dismiss();
-            }
-        });
-
-        alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialogInterface) {
-                etTag.setSelection(etTag.getText().length());
+                tagSelectorView.show();
             }
         });
     }
@@ -286,14 +265,20 @@ public class MainActivity extends AppCompatActivity {
         (findViewById(R.id.btnViewMonth)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, MonthExpensesActivity.class));
+                Intent intent = new Intent(MainActivity.this, MonthExpensesActivity.class);
+                intent.putExtra(Utils.MONTH_NUMBER_INTENT_STRING, month + 1);
+                intent.putExtra(Utils.YEAR_INTENT_STRING, year);
+                startActivity(intent);
             }
         });
 
         (findViewById(R.id.btnBrowseTags)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, BrowseTagsActivity.class));
+                Intent intent = new Intent(MainActivity.this, BrowseTagsActivity.class);
+                intent.putExtra(Utils.MONTH_NUMBER_INTENT_STRING, month + 1);
+                intent.putExtra(Utils.YEAR_INTENT_STRING, year);
+                startActivity(intent);
             }
         });
     }
@@ -352,7 +337,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Button btn = (Button) view;
-                etSpentAmount.setText(btn.getText());
+                int amount;
+                if (etSpentAmount.getText().toString().length() == 0) {
+                    etSpentAmount.setText(btn.getText());
+                } else {
+                    amount = Integer.parseInt(etSpentAmount.getText().toString());
+                    amount += Integer.parseInt(btn.getText().toString());
+                    etSpentAmount.setText("" + amount);
+                }
             }
         };
 
@@ -517,7 +509,7 @@ public class MainActivity extends AppCompatActivity {
 
                 date += "-all";
 
-                Utils.getInputDialogBuilder(this,date + ".csv")
+                Utils.getInputDialogBuilder(this, date + ".csv")
                         .setTitle(getResources().getString(R.string.enterFileName))
                         .setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
                             @Override
@@ -594,14 +586,18 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_stats:
-                startActivity(new Intent(MainActivity.this, StatsActivity.class));
+                Intent intent = new Intent(MainActivity.this, StatsActivity.class);
+                intent.putExtra(Utils.MONTH_NUMBER_INTENT_STRING, month + 1);
+                intent.putExtra(Utils.YEAR_INTENT_STRING, year);
+                startActivity(intent);
+                break;
 
+            case R.id.action_settings:
+                startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+                break;
         }
-
         return super.onOptionsItemSelected(item);
     }
-
-
 
 
 }

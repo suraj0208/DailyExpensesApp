@@ -82,6 +82,7 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
 
         if (tags.size() == 0) {
             tags.add(getString(R.string.daily_tag));
+            monthlyViewStateHolder = new MonthlyViewStateHolder();
             monthlyViewStateHolder.addElement(getString(R.string.daily_tag));
         }
 
@@ -147,6 +148,7 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
             public void onClick(View view) {
                 Intent intent = new Intent(ViewExpensesActivity.this, MonthExpensesActivity.class);
                 intent.putExtra(Utils.MONTH_NUMBER_INTENT_STRING, month);
+                intent.putExtra(Utils.YEAR_INTENT_STRING, year);
                 startActivity(intent);
             }
         });
@@ -251,10 +253,7 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
 
             if (sequence.hasFired())
                 showTipsForListView();
-
         }
-
-
     }
 
     private void showTipsForListView() {
@@ -366,7 +365,7 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
 
         listView.setAdapter(new BasicItemsAdapter(getApplicationContext(), items, this));
         tvExpenditureForDate.setText("" + Utils.getExpenditureForDate(date, monthlyViewStateHolder));
-        tvExpenditureForMonth.setText("" + Utils.getExpensesForMonth(Integer.parseInt(date.split("/")[1]), monthlyViewStateHolder));
+        tvExpenditureForMonth.setText("" + Utils.getExpensesForMonth(Integer.parseInt(date.split("/")[1]), year, monthlyViewStateHolder));
 
         btnCurrentDate.setText(day + "/" + month);
         btnCurrentMonth.setText(Utils.getMonthNameFromNumber(Integer.parseInt(date.split("/")[1])));

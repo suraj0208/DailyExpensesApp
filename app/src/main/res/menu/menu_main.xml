@@ -3,25 +3,31 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_exportEntire"
-        android:orderInCategory="100"
+        android:orderInCategory="3"
         android:title="@string/exportDatabase"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_backup"
-        android:orderInCategory="100"
+        android:orderInCategory="1"
         android:title="Backup"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_restore"
-        android:orderInCategory="100"
+        android:orderInCategory="2"
         android:title="Restore"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_stats"
+        android:orderInCategory="4"
         android:title="Stats"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="5"
+        android:title="Settings"
+        app:showAsAction="never" />
 </menu>

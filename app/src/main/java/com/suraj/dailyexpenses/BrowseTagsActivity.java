@@ -29,49 +29,94 @@ public class BrowseTagsActivity extends AppCompatActivity implements InflationMa
     private Utils.TagsComparator tagsComparator;
     private AlertDialog alertDialog;
     private Spinner spinMonth;
+    private Spinner spinYear;
     private int monthNumber;
+    private int year;
     private TextView tvExpenditureForMonth;
     private Button btnMonthlyDetailsMonthName;
+    private ArrayList<String> monthList;
+    private ArrayList<String> yearList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_browse_tags);
+
         lstViewBrowseTags = (ListView) findViewById(R.id.lstViewBrowseTags);
+
         spinMonth = (Spinner) findViewById(R.id.spinMonths);
+        spinYear = (Spinner) findViewById(R.id.spinYear);
+
         tagsComparator = new Utils.TagsComparator();
         tagsComparator.setType(1);
+
         tvExpenditureForMonth = (TextView) findViewById(R.id.tvExpenditureForMonth);
+
         btnMonthlyDetailsMonthName = (Button) findViewById(R.id.btnMonthlyDetailsMonthName);
+
+        monthNumber = getIntent().getIntExtra(Utils.MONTH_NUMBER_INTENT_STRING, -1);
+        year = getIntent().getIntExtra(Utils.YEAR_INTENT_STRING, -1);
 
         setUpSpinner();
         setUpMonthDetailsViews();
 
-        tagItemsHolderList = Utils.getTagData(monthNumber);
-        Collections.sort(tagItemsHolderList,tagsComparator);
 
         updateListView();
         setUpSortDialog();
     }
 
     private void setUpMonthDetailsViews() {
-        tvExpenditureForMonth.setText("" + Utils.getExpensesForMonth(monthNumber,null));
+        tvExpenditureForMonth.setText("" + Utils.getExpensesForMonth(monthNumber, year, null));
         btnMonthlyDetailsMonthName.setText(Utils.getMonthNameFromNumber(monthNumber));
     }
 
     private void setUpSpinner() {
-        final ArrayList<String> monthList = Utils.getMonthsFromDatabase();
+        monthList = Utils.getMonthsFromDatabase();
         Collections.sort(monthList, Utils.monthComparator);
+        monthList.add(0, "All");
+        int i = 0;
+
+        if (monthList.size() > 1) {
+            i = monthList.indexOf(Utils.getMonthNameFromNumber(monthNumber));
+
+            if (i == -1) {
+                monthList.add(Utils.getMonthNameFromNumber(monthNumber));
+            }
+
+        }
+
         spinMonth.setAdapter(new ArrayAdapter<>(BrowseTagsActivity.this, android.R.layout.simple_spinner_dropdown_item, monthList));
 
-        monthNumber = Utils.getMonthNumberFromString(monthList.get(spinMonth.getSelectedItemPosition()));
+        if (i != -1) {
+            spinMonth.setSelection(i);
+        }
+
+        yearList = Utils.getYearsFromDatabase();
+        Collections.sort(yearList);
+
+        i = 0;
+        if (yearList.size() == 0) {
+            yearList.add("" + year);
+        } else {
+            i = yearList.indexOf("" + year);
+
+            if (i == -1) {
+                yearList.add("" + year);
+            }
+        }
+
+        spinYear.setAdapter(new ArrayAdapter<>(BrowseTagsActivity.this, android.R.layout.simple_spinner_dropdown_item, yearList));
+
+        if (i != -1) {
+            spinYear.setSelection(i);
+        }
 
         spinMonth.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 monthNumber = Utils.getMonthNumberFromString(monthList.get(spinMonth.getSelectedItemPosition()));
-                tagItemsHolderList = Utils.getTagData(monthNumber);
-                Collections.sort(tagItemsHolderList,tagsComparator);
+                tagItemsHolderList = Utils.getTagData(monthNumber, year);
+                Collections.sort(tagItemsHolderList, tagsComparator);
                 updateListView();
                 setUpMonthDetailsViews();
             }
@@ -82,9 +127,32 @@ public class BrowseTagsActivity extends AppCompatActivity implements InflationMa
             }
         });
 
+        spinYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                year = Integer.parseInt(yearList.get(i));
+                tagItemsHolderList = Utils.getTagData(monthNumber, year);
+                Collections.sort(tagItemsHolderList, tagsComparator);
+                updateListView();
+                setUpMonthDetailsViews();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
     }
 
     private void updateListView() {
+        tagItemsHolderList = Utils.getTagData(monthNumber, year);
+
+        if (tagItemsHolderList.size() == 0) {
+            tagItemsHolderList.add(new TagItemsHolder("-1"));
+        }
+
+        Collections.sort(tagItemsHolderList, tagsComparator);
+
         lstViewBrowseTags.setAdapter(new BrowseTagsAdapter(this, tagItemsHolderList, this));
     }
 
@@ -92,6 +160,12 @@ public class BrowseTagsActivity extends AppCompatActivity implements InflationMa
     public void onGetView(int position, View convertView, ViewGroup parent) {
         TextView tvTagName = (TextView) convertView.findViewById(R.id.tvItemName);
         TextView tvTagAmount = (TextView) convertView.findViewById(R.id.tvItemAmount);
+
+        if (tagItemsHolderList.get(position).getTagName().equals("-1")) {
+            tvTagName.setText(getString(R.string.noData));
+            tvTagAmount.setVisibility(View.INVISIBLE);
+            return;
+        }
 
         tvTagName.setText(tagItemsHolderList.get(position).getTagName());
         tvTagAmount.setText("" + tagItemsHolderList.get(position).getSum());

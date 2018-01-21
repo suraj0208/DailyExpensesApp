@@ -44,6 +44,7 @@ import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
+import io.realm.Sort;
 import io.realm.exceptions.RealmMigrationNeededException;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
@@ -58,6 +59,7 @@ public class Utils {
     public static final String VIEW_EXPENSES_ACTIVITY_LISTVIEW_TIPS = "v3ViewExpensesActivityListViewTips";
 
     public static final String MONTH_NUMBER_INTENT_STRING = "monthNumber";
+    public static final String YEAR_INTENT_STRING = "year";
     public static final String DATE_INTENT_STRING = "date";
     public static final String ITEM_INTENT_STRING = "basicitem";
     public static final String TIMESTAMP_INTENT_STRING = "basicitem";
@@ -66,6 +68,12 @@ public class Utils {
 
     public static final String REMINDERS_SHARED_PREFERENCE_STRING = "reminders";
     public static final String MONTHLY_STATE_HOLDER_INTENT_STRING = "monthly_state_holder";
+    public static final String SETTINGS_DEFAULT_TAG = "default_tag";
+    public static final String DEFAULT_TAG_NAME = "Daily";
+    public static final String SETTINGS_DEFAULT_TAG_FILTER = "default_tag_filter";
+    public static final String SETTINGS_DEFAULT_TAG_FILTER_MODE = "default_tag_filter_mode";
+    public static final String SETTINGS_DEFAULT_TAG_FILTER_STATS = "default_tag_filter_mode_stats";
+    public static final String SETTINGS_DEFAULT_TAG_FILTER_MODE_STATS = "default_tag_filter_mode_stats";
 
     public static Comparator<Object> dateComparator;
     public static Comparator<String> monthComparator;
@@ -77,12 +85,23 @@ public class Utils {
     private static Context context;
 
     private static SharedPreferences sharedPreferences;
+
+    public static SharedPreferences.Editor getEditor() {
+        return editor;
+    }
+
+    public static SharedPreferences getSharedPreferences() {
+        if (sharedPreferences == null)
+            initPrefs();
+        return sharedPreferences;
+    }
+
     private static SharedPreferences.Editor editor;
 
     private static RealmResults<BasicItem> tempRealmResults;
 
     public static List<BasicItem> getAllItemsForMonth(int month) {
-        RealmQuery<BasicItem> itemRealmQuery = realm.where(BasicItem.class).equalTo("month",month);
+        RealmQuery<BasicItem> itemRealmQuery = realm.where(BasicItem.class).equalTo("month", month);
 
         ArrayList<BasicItem> items = new ArrayList<>();
         items.addAll(itemRealmQuery.findAll());
@@ -90,6 +109,15 @@ public class Utils {
         Collections.sort(items, dateComparator);
 
         return items;
+    }
+
+    public static String getStringFromSharedPreferences(String settingsDefaultTag) {
+        if (sharedPreferences == null) {
+            initPrefs();
+        }
+
+        String ret = sharedPreferences.getString(Utils.SETTINGS_DEFAULT_TAG, Utils.DEFAULT_TAG_NAME);
+        return ret;
     }
 
     static class SortingComparator implements Comparator<BasicItem> {
@@ -388,26 +416,45 @@ public class Utils {
         return new ArrayList<>(monthSet);
     }
 
-    public static int getExpensesForMonth(int month, MonthlyViewStateHolder monthlyViewStateHolder) {
+    public static ArrayList<String> getYearsFromDatabase() {
         RealmQuery<BasicItem> itemRealmQuery = realm.where(BasicItem.class);
         RealmResults<BasicItem> realmResults = itemRealmQuery.findAll();
+
+        HashSet<String> yearSet = new HashSet<>();
+
+        for (BasicItem basicItem : realmResults) {
+            yearSet.add(Integer.toString(basicItem.getYear()));
+        }
+
+        return new ArrayList<>(yearSet);
+    }
+
+    public static int getExpensesForMonth(int month, int year, MonthlyViewStateHolder monthlyViewStateHolder) {
+        RealmQuery<BasicItem> itemRealmQuery;
+
+        if (year == 0) {
+            itemRealmQuery = realm.where(BasicItem.class);
+        } else if (month == 13) {
+            itemRealmQuery = realm.where(BasicItem.class).equalTo("year", year);
+        } else {
+            itemRealmQuery = realm.where(BasicItem.class).equalTo("year", year).equalTo("month", month);
+        }
+
+        RealmResults<BasicItem> realmResults = itemRealmQuery.findAll();
+
         int sum = 0;
         for (BasicItem basicItem : realmResults) {
-
-            int currentMonth = basicItem.getMonth();
-
-            if (currentMonth != month || (monthlyViewStateHolder != null && monthlyViewStateHolder.isElementIncluded(basicItem.getTag()) == monthlyViewStateHolder.isInvertMode()))
+            if (monthlyViewStateHolder != null && monthlyViewStateHolder.isElementIncluded(basicItem.getTag()) == monthlyViewStateHolder.isInvertMode())
                 continue;
 
             sum += basicItem.getAmount();
-
         }
 
         return sum;
     }
 
     public static String getMonthNameFromNumber(int month) {
-        String[] months = {"PLACE_HOLDER", "Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"};
+        String[] months = {"PLACE_HOLDER", "Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec", "All"};
         return months[month];
     }
 
@@ -426,11 +473,12 @@ public class Utils {
         stringStringHashMap.put("Oct", 10);
         stringStringHashMap.put("Nov", 11);
         stringStringHashMap.put("Dec", 12);
+        stringStringHashMap.put("All", 13);
 
         return stringStringHashMap.get(monthName);
     }
 
-    public static ArrayList<BasicItem> getDataForMonth(int month, MonthlyViewStateHolder monthlyViewStateHolder) {
+    public static ArrayList<BasicItem> getDataForMonth(int month, int year, MonthlyViewStateHolder monthlyViewStateHolder) {
         RealmQuery<BasicItem> itemRealmQuery = realm.where(BasicItem.class);
         RealmResults<BasicItem> realmResults = itemRealmQuery.findAll();
 
@@ -439,7 +487,7 @@ public class Utils {
         for (BasicItem basicItem : realmResults) {
             String date = basicItem.getDate();
 
-            if (basicItem.getMonth() != month || (monthlyViewStateHolder != null && monthlyViewStateHolder.isElementIncluded(basicItem.getTag()) == monthlyViewStateHolder.isInvertMode()))
+            if (basicItem.getMonth() != month || basicItem.getYear() != year || monthlyViewStateHolder != null && monthlyViewStateHolder.isElementIncluded(basicItem.getTag()) == monthlyViewStateHolder.isInvertMode())
                 continue;
 
             Integer current = monthExpensesTreeMap.get(date);
@@ -448,8 +496,6 @@ public class Utils {
             } else {
                 monthExpensesTreeMap.put(date, current + basicItem.getAmount());
             }
-
-
         }
 
         ArrayList<BasicItem> basicItems = new ArrayList<>();
@@ -461,7 +507,7 @@ public class Utils {
             basicItems.add(basicItem);
         }
 
-        Collections.sort(basicItems,dateComparator);
+        Collections.sort(basicItems, dateComparator);
 
         return basicItems;
 
@@ -473,28 +519,33 @@ public class Utils {
 
         tempRealmResults = realmResults;
 
-        HashMap<Integer, Integer> monthItemExpenses = new HashMap<>();
+        HashMap<String, Integer> monthItemExpenses = new HashMap<>();
 
-        for (BasicItem BasicItem : realmResults) {
+        for (BasicItem basicItem : realmResults) {
 
-            String date = BasicItem.getDate();
+            int currentMonth = basicItem.getMonth();
+            int currentYear = basicItem.getYear();
 
-            int currentMonth = Integer.parseInt(date.split("/")[1]);
-            Integer current = monthItemExpenses.get(currentMonth);
+            String hkey = "" + currentMonth + "/" + currentYear;
+            Integer current = monthItemExpenses.get(hkey);
 
             if (current == null) {
-                monthItemExpenses.put(currentMonth, BasicItem.getAmount());
+                monthItemExpenses.put(hkey, basicItem.getAmount());
             } else {
-                monthItemExpenses.put(currentMonth, current + BasicItem.getAmount());
+                monthItemExpenses.put(hkey, current + basicItem.getAmount());
             }
         }
 
         ArrayList<BasicItem> basicItems = new ArrayList<>();
 
-        for (Integer month : monthItemExpenses.keySet()) {
+        for (String hkey : monthItemExpenses.keySet()) {
             BasicItem basicItem = new BasicItem();
+            int month = Integer.parseInt(hkey.split("/")[0]);
+            int year = Integer.parseInt(hkey.split("/")[1]);
+
             basicItem.setMonth(month);
-            basicItem.setAmount(monthItemExpenses.get(month));
+            basicItem.setYear(year);
+            basicItem.setAmount(monthItemExpenses.get(hkey));
             basicItems.add(basicItem);
         }
 
@@ -510,26 +561,26 @@ public class Utils {
         return sum;
     }
 
-    public static ArrayList<BasicItem> getExpenditureForItemForMonth(int clickedMonth) {
+    public static ArrayList<BasicItem> getExpenditureForItemForMonth(int clickedMonth, int year) {
         RealmResults<BasicItem> realmResults = tempRealmResults;
 
 
         HashMap<String, Integer> monthItemExpenses = new HashMap<>();
 
-        for (BasicItem BasicItem : realmResults) {
+        for (BasicItem basicItem : realmResults) {
 
-            String date = BasicItem.getDate();
+            String date = basicItem.getDate();
 
-            if (Integer.parseInt(date.split("/")[1]) != clickedMonth)
+            if (basicItem.getMonth() != clickedMonth || basicItem.getYear() != year)
                 continue;
 
 
             Integer current = monthItemExpenses.get(date);
 
             if (current == null) {
-                monthItemExpenses.put(date, BasicItem.getAmount());
+                monthItemExpenses.put(date, basicItem.getAmount());
             } else {
-                monthItemExpenses.put(date, current + BasicItem.getAmount());
+                monthItemExpenses.put(date, current + basicItem.getAmount());
             }
         }
 
@@ -550,29 +601,29 @@ public class Utils {
     }
 
 
-    public static HashMap<String, Integer> getTopItemsForMonth(int month) {
+    public static HashMap<String, Integer> getTopItemsForMonth(int month, int year) {
         RealmQuery<BasicItem> itemRealmQuery = realm.where(BasicItem.class);
 
         RealmResults<BasicItem> realmResults = itemRealmQuery.findAll();
 
         HashMap<String, Integer> monthItemExpenses = new HashMap<>();
 
-        for (BasicItem BasicItem : realmResults) {
+        for (BasicItem basicItem : realmResults) {
 
-            String date = BasicItem.getDate();
+            String date = basicItem.getDate();
 
-            int currentMonth = Integer.parseInt(date.split("/")[1]);
+            int currentMonth = basicItem.getMonth();
 
-            if (currentMonth != month)
+            if (currentMonth != month || basicItem.getYear() != year)
                 continue;
 
 
-            Integer current = monthItemExpenses.get(BasicItem.getReason());
+            Integer current = monthItemExpenses.get(basicItem.getReason());
 
             if (current == null) {
-                monthItemExpenses.put(BasicItem.getReason(), BasicItem.getAmount());
+                monthItemExpenses.put(basicItem.getReason(), basicItem.getAmount());
             } else {
-                monthItemExpenses.put(BasicItem.getReason(), current + BasicItem.getAmount());
+                monthItemExpenses.put(basicItem.getReason(), current + basicItem.getAmount());
             }
         }
 
@@ -766,8 +817,10 @@ public class Utils {
             }
 
             realm.commitTransaction();
+            Utils.getEditor().putStringSet(Utils.SETTINGS_DEFAULT_TAG_FILTER, new HashSet<>(Utils.getAllTags()));
+            Utils.getEditor().putBoolean(Utils.SETTINGS_DEFAULT_TAG_FILTER_MODE, false);
+            Utils.getEditor().apply();
             Utils.showToast(context.getString(R.string.restoreCompleteNotify));
-
 
         } catch (FileNotFoundException e) {
             Utils.showToast(context.getString(R.string.backupNotFoundNotify));
@@ -901,14 +954,16 @@ public class Utils {
         return true;
     }
 
-    public static List<TagItemsHolder> getTagData(int monthNumber) {
+    public static List<TagItemsHolder> getTagData(int monthNumber, int year) {
         RealmQuery<BasicItem> itemRealmQuery;
 
-        if(monthNumber <=0)
+        if (monthNumber <= 0)
             itemRealmQuery = realm.where(BasicItem.class);
-        else
-            itemRealmQuery = realm.where(BasicItem.class).equalTo("month",monthNumber);
-
+        else if (monthNumber == 13) {
+            itemRealmQuery = realm.where(BasicItem.class).equalTo("year", year);
+        } else {
+            itemRealmQuery = realm.where(BasicItem.class).equalTo("month", monthNumber).equalTo("year", year);
+        }
         HashMap<String, TagItemsHolder> tagItemsHoldersHashMap = new HashMap<>();
 
         for (BasicItem basicItem : itemRealmQuery.findAll()) {
@@ -916,7 +971,7 @@ public class Utils {
 
             if (tagItemsHolder == null) {
                 tagItemsHolder = new TagItemsHolder(basicItem.getTag());
-                tagItemsHoldersHashMap.put(basicItem.getTag(),tagItemsHolder);
+                tagItemsHoldersHashMap.put(basicItem.getTag(), tagItemsHolder);
             }
 
             tagItemsHolder.addToList(basicItem);
@@ -926,13 +981,16 @@ public class Utils {
 
         List<TagItemsHolder> tagItemsHolders = new ArrayList<>();
 
-        for(String key:tagItemsHoldersHashMap.keySet())
+        for (String key : tagItemsHoldersHashMap.keySet())
             tagItemsHolders.add(tagItemsHoldersHashMap.get(key));
 
         return tagItemsHolders;
     }
 
-
+    public static BasicItem getLatest() {
+        RealmQuery<BasicItem> itemRealmQuery = realm.where(BasicItem.class);
+        return itemRealmQuery.findAllSorted("timestamp", Sort.DESCENDING).first();
+    }
 }
 
 /*

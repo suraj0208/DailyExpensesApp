@@ -15,6 +15,18 @@
         android:paddingRight="@dimen/activity_vertical_margin"
         android:paddingStart="@dimen/activity_vertical_margin" />
 
+    <android.support.v7.widget.AppCompatSpinner
+        android:id="@+id/spinYear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/spinMonths"
+        android:layout_marginTop="16dp"
+        android:layout_toRightOf="@id/spinMonths"
+        android:paddingEnd="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_vertical_margin"
+        android:paddingRight="@dimen/activity_vertical_margin"
+        android:paddingStart="@dimen/activity_vertical_margin" />
+
     <FrameLayout
         android:id="@+id/frameLayoutMonthlyDetails"
         android:layout_width="wrap_content"

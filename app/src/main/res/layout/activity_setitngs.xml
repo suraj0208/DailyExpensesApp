@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".SettingsActivity">
+
+    <TextView
+        android:id="@+id/setting_tv_default_tag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_default_tag_label" />
+
+    <EditText
+        android:id="@+id/setting_et_default_tag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/setting_tv_default_tag"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true" />
+
+    <TextView
+        android:id="@+id/setting_tv_default_filter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/setting_et_default_tag"
+        android:layout_marginTop="@dimen/setting_lable_seperator"
+        android:text="@string/settings_default_filter_label" />
+
+    <Button
+        android:id="@+id/setting_btn_default_filter"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_alignBottom="@id/setting_tv_default_filter"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="25dp"
+        android:background="@drawable/ic_settings_black_24dp" />
+
+    <TextView
+        android:id="@+id/setting_tv_default_filter_stats"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/setting_tv_default_filter"
+        android:layout_marginTop="@dimen/setting_lable_seperator"
+        android:text="@string/settings_default_filter_label" />
+
+    <Button
+        android:id="@+id/setting_btn_default_filter_stats"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_alignBottom="@id/setting_tv_default_filter_stats"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="25dp"
+        android:background="@drawable/ic_settings_black_24dp" />
+
+</RelativeLayout>

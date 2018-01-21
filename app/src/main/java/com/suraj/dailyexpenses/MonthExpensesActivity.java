@@ -30,18 +30,21 @@ import com.suraj.dailyexpenses.widgets.TagsFilterView;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 public class MonthExpensesActivity extends AppCompatActivity implements InflationManager {
     private static MonthExpensesActivity monthExpensesActivity;
 
     private int monthNumber;
+    private int year;
 
     private ArrayList<BasicItem> basicItems;
 
     private Utils.SortingComparator sortingComparator;
 
     private Spinner spinMonth;
+    private Spinner spinYear;
 
     private TextView tvExpenditureForMonth;
 
@@ -54,6 +57,8 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
     private MonthlyViewStateHolder monthlyViewStateHolder;
 
     private List<String> tags;
+    private ArrayList<String> monthList;
+    private ArrayList<String> yearList;
 
 
     @Override
@@ -65,6 +70,7 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
         sortingComparator.setType(0);
 
         spinMonth = (Spinner) findViewById(R.id.spinMonths);
+        spinYear = (Spinner) findViewById(R.id.spinYear);
 
         tvExpenditureForMonth = (TextView) findViewById(R.id.tvExpenditureForMonth);
 
@@ -73,42 +79,58 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
         btnMonthlyDetailsMonthName = (Button) findViewById(R.id.btnMonthlyDetailsMonthName);
 
         monthlyViewStateHolder = new MonthlyViewStateHolder();
-        monthlyViewStateHolder.addAllElements(Utils.getAllTags());
+
+        loadSettings();
 
         (findViewById(R.id.tvExpenseItemName)).setVisibility(View.GONE);
 
-        ArrayList<String> monthList = Utils.getMonthsFromDatabase();
+        monthList = Utils.getMonthsFromDatabase();
+        yearList = Utils.getYearsFromDatabase();
         Collections.sort(monthList, Utils.monthComparator);
-        spinMonth.setAdapter(new ArrayAdapter<>(MonthExpensesActivity.this, android.R.layout.simple_spinner_dropdown_item, monthList));
+        Collections.sort(yearList);
 
-        if (monthList.size() > 0 && getIntent().getIntExtra(Utils.MONTH_NUMBER_INTENT_STRING, -1) == -1) {
-            spinMonth.setSelection(monthList.size() - 1);
-            monthNumber = Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString());
-            basicItems = Utils.getDataForMonth(monthNumber, monthlyViewStateHolder);
-        } else if (monthList.size() > 0) {
-            monthNumber = getIntent().getIntExtra(Utils.MONTH_NUMBER_INTENT_STRING, -1);
-            basicItems = Utils.getDataForMonth(monthNumber, monthlyViewStateHolder);
+        setUpSpinner();
+
+        monthNumber = getIntent().getIntExtra(Utils.MONTH_NUMBER_INTENT_STRING, -1);
+        year = getIntent().getIntExtra(Utils.YEAR_INTENT_STRING, -1);
+
+        if (monthList.size() > 0) {
+            spinMonth.setAdapter(new ArrayAdapter<>(MonthExpensesActivity.this, android.R.layout.simple_spinner_dropdown_item, monthList));
+            spinYear.setAdapter(new ArrayAdapter<>(MonthExpensesActivity.this, android.R.layout.simple_spinner_dropdown_item, yearList));
+
+            basicItems = Utils.getDataForMonth(monthNumber, year, monthlyViewStateHolder);
 
             String monthName = Utils.getMonthNameFromNumber(monthNumber);
 
-            int i;
-            for (i = 0; i < monthList.size(); i++) {
-                if (monthList.get(i).equals(monthName)) {
-                    spinMonth.setSelection(i);
-                    break;
-                }
+            int i = monthList.indexOf(monthName);
+
+            if (i == -1) {
+                monthList.add(monthName);
+                spinMonth.setAdapter(new ArrayAdapter<>(MonthExpensesActivity.this, android.R.layout.simple_spinner_dropdown_item, monthList));
+                spinMonth.setSelection(monthList.size()-1);
+            }else{
+                spinMonth.setSelection(i);
             }
 
-            if (i == monthList.size()) {
-                monthList.add(monthName);
-                spinMonth.setSelection(monthList.size() - 1);
+            i = yearList.indexOf(""+year);
+
+            if (i == -1) {
+                yearList.add(monthName);
+                spinYear.setAdapter(new ArrayAdapter<>(MonthExpensesActivity.this, android.R.layout.simple_spinner_dropdown_item, yearList));
+                spinYear.setSelection(yearList.size()-1);
+            }else{
+                spinYear.setSelection(i);
             }
+
         } else if (monthList.size() == 0) {
             Calendar c = Calendar.getInstance();
             monthList.add(Utils.getMonthNameFromNumber(c.get(Calendar.MONTH) + 1));
+            yearList.add(""+year);
             spinMonth.setAdapter(new ArrayAdapter<>(MonthExpensesActivity.this, android.R.layout.simple_spinner_dropdown_item, monthList));
+            spinYear.setAdapter(new ArrayAdapter<>(MonthExpensesActivity.this, android.R.layout.simple_spinner_dropdown_item, yearList));
         }
-        tvExpenditureForMonth.setText("" + Utils.getExpensesForMonth(Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString()), monthlyViewStateHolder));
+
+        tvExpenditureForMonth.setText("" + Utils.getExpensesForMonth(Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString()), year, monthlyViewStateHolder));
 
         displayDetailsInViews();
 
@@ -127,18 +149,6 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
             }
         });
 
-        spinMonth.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                displayDetailsInViews();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
         setUpSortDialog();
 
         ensureSingleInstanceOnActivityStack();
@@ -151,6 +161,37 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
             tags.add(getString(R.string.daily_tag));
             monthlyViewStateHolder.addElement(getString(R.string.daily_tag));
         }
+    }
+
+    private void loadSettings() {
+        monthlyViewStateHolder.addAllElements(Utils.getSharedPreferences().getStringSet(Utils.SETTINGS_DEFAULT_TAG_FILTER, new HashSet<String>()));
+        monthlyViewStateHolder.setInvertMode(Utils.getSharedPreferences().getBoolean(Utils.SETTINGS_DEFAULT_TAG_FILTER_MODE, false));
+    }
+
+    private void setUpSpinner() {
+        spinMonth.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                displayDetailsInViews();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        spinYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                displayDetailsInViews();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
     }
 
     public void requestSelfPermission() {
@@ -308,13 +349,13 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
         tagsFilterView.setSwitchClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Switch aSwitch = (Switch)view;
+                Switch aSwitch = (Switch) view;
 
                 monthlyViewStateHolder.setInvertMode(!monthlyViewStateHolder.isInvertMode());
 
-                if(monthlyViewStateHolder.isInvertMode()){
+                if (monthlyViewStateHolder.isInvertMode()) {
                     aSwitch.setText(getString(R.string.include_these));
-                }else{
+                } else {
                     aSwitch.setText(getString(R.string.exclude_these));
                 }
 
@@ -347,13 +388,15 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
     private void updateListView() {
         BasicItemsAdapter basicItemsAdapter = new BasicItemsAdapter(getApplicationContext(), basicItems, this);
         listViewExpensesDays.setAdapter(basicItemsAdapter);
-        tvExpenditureForMonth.setText("" + Utils.getExpensesForMonth(Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString()), monthlyViewStateHolder));
+        tvExpenditureForMonth.setText("" + Utils.getExpensesForMonth(Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString()), year, monthlyViewStateHolder));
         btnMonthlyDetailsMonthName.setText(spinMonth.getSelectedItem().toString());
     }
 
     private void getItemsFromDB() {
         monthNumber = Utils.getMonthNumberFromString(spinMonth.getSelectedItem().toString());
-        basicItems = Utils.getDataForMonth(monthNumber, monthlyViewStateHolder);
+        year = Integer.parseInt(spinYear.getSelectedItem().toString());
+
+        basicItems = Utils.getDataForMonth(monthNumber, year, monthlyViewStateHolder);
 
         if (!isDataAvailableForCurrentMonth()) {
             BasicItem basicItem = new BasicItem();

@@ -39,10 +39,10 @@ public class TagsAdapter extends ArrayAdapter {
         final TextView tv = (TextView) rowView.findViewById(R.id.tvTagName);
         tv.setText(tags.get(position));
 
-        if (monthlyViewStateHolder.isElementIncluded(tags.get(position))) {
-            tv.setPaintFlags(tv.getPaintFlags() & Paint.STRIKE_THRU_TEXT_FLAG);
-        } else {
+        if (monthlyViewStateHolder.isInvertMode() == monthlyViewStateHolder.isElementIncluded(tags.get(position))) {
             tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        } else {
+            tv.setPaintFlags(tv.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
         }
 
 

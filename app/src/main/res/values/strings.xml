@@ -100,5 +100,7 @@
     <string name="most_expensive_string">%1$s is the most expensive item, costs Rs. %2$s.</string>
     <string name="week_expense_string">Spent in %1$s week: Rs. %2$s</string>
     <string name="weekend_expense_string">Spent in %1$s weekend: Rs. %2$s</string>
-
+    <string name="settings_default_tag_label">Default tag</string>
+    <string name="settings_default_filter_label">Default filter items</string>
+    <string name="settings_default_filter_stats_label">Default filter items for stats</string>
 </resources>
