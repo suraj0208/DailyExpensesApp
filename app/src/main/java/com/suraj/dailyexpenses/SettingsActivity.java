@@ -58,11 +58,11 @@ public class SettingsActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
                 final TextView tv = (TextView) view.findViewById(R.id.tvTagName);
 
-                if (monthlyViewStateHolder.isElementIncluded(tags.get(i))) {
-                    tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                if (monthlyViewStateHolder.isElementIncludedInList(tags.get(i))) {
+                    tv.setPaintFlags(tv.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
                     monthlyViewStateHolder.removeElement(tags.get(i));
                 } else {
-                    tv.setPaintFlags(tv.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+                    tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                     monthlyViewStateHolder.addElement(tags.get(i));
                 }
             }
@@ -73,6 +73,7 @@ public class SettingsActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Switch aSwitch = (Switch) view;
 
+                //monthlyViewStateHolder.invertList();
                 monthlyViewStateHolder.setInvertMode(!monthlyViewStateHolder.isInvertMode());
 
                 if (monthlyViewStateHolder.isInvertMode()) {
@@ -142,8 +143,13 @@ public class SettingsActivity extends AppCompatActivity {
 
         monthlyViewStateHolder = new MonthlyViewStateHolder();
 
+        //order is important here
         monthlyViewStateHolder.addAllElements(Utils.getSharedPreferences().getStringSet(Utils.SETTINGS_DEFAULT_TAG_FILTER, new HashSet<String>()));
         monthlyViewStateHolder.setInvertMode(Utils.getSharedPreferences().getBoolean(Utils.SETTINGS_DEFAULT_TAG_FILTER_MODE, false));
+
+        System.out.println("cs: " + monthlyViewStateHolder.getCurrentTags().size());
+        System.out.println("ct: " + monthlyViewStateHolder.isInvertMode());
+
     }
 
     private void initViews() {
@@ -167,12 +173,14 @@ public class SettingsActivity extends AppCompatActivity {
         Utils.getEditor().putStringSet(Utils.SETTINGS_DEFAULT_TAG_FILTER, monthlyViewStateHolder.getCurrentTags());
         Utils.getEditor().putBoolean(Utils.SETTINGS_DEFAULT_TAG_FILTER_MODE, defaultTagFilterMode);
 
+        System.out.println("s: " + monthlyViewStateHolder.getCurrentTags().size());
+        System.out.println("t: " + monthlyViewStateHolder.isInvertMode());
+
         Utils.getEditor().apply();
     }
 
     public void initTagSelectorView() {
         final List<String> tags = Utils.getAllTags();
-        MonthlyViewStateHolder monthlyViewStateHolder = new MonthlyViewStateHolder();
         tagSelectorView = new TagSelectorView(SettingsActivity.this, tags, monthlyViewStateHolder);
 
         tagSelectorView.setTagClickListener(new AdapterView.OnItemClickListener() {

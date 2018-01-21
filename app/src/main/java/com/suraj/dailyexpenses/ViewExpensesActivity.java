@@ -1,20 +1,13 @@
 package com.suraj.dailyexpenses;
 
-import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Paint;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.text.InputType;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -407,11 +400,11 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
             public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
                 final TextView tv = (TextView) view.findViewById(R.id.tvTagName);
 
-                if (monthlyViewStateHolder.isElementIncluded(tags.get(i))) {
-                    tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                if (monthlyViewStateHolder.isElementIncludedInList(tags.get(i))) {
+                    tv.setPaintFlags(tv.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
                     monthlyViewStateHolder.removeElement(tags.get(i));
                 } else {
-                    tv.setPaintFlags(tv.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+                    tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                     monthlyViewStateHolder.addElement(tags.get(i));
                 }
 
@@ -423,6 +416,7 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
             public void onClick(View view) {
                 Switch aSwitch = (Switch)view;
 
+                //monthlyViewStateHolder.invertList();
                 monthlyViewStateHolder.setInvertMode(!monthlyViewStateHolder.isInvertMode());
 
                 if(monthlyViewStateHolder.isInvertMode()){

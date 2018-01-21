@@ -1,4 +1,5 @@
 package com.suraj.dailyexpenses.widgets;
+
 import android.content.Context;
 import android.graphics.Paint;
 import android.view.LayoutInflater;
@@ -39,7 +40,7 @@ public class TagsAdapter extends ArrayAdapter {
         final TextView tv = (TextView) rowView.findViewById(R.id.tvTagName);
         tv.setText(tags.get(position));
 
-        if (monthlyViewStateHolder.isInvertMode() == monthlyViewStateHolder.isElementIncluded(tags.get(position))) {
+        if (monthlyViewStateHolder.isElementIncludedInList(tags.get(position))) {
             tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
         } else {
             tv.setPaintFlags(tv.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
@@ -48,7 +49,7 @@ public class TagsAdapter extends ArrayAdapter {
 
            /* final CheckBox checkBox = (CheckBox) rowView.findViewById(R.id.checkboxTag);
 
-            if (monthlyViewStateHolder.isElementIncluded(tags.get(position))) {
+            if (monthlyViewStateHolder.isElementAllowed(tags.get(position))) {
                 checkBox.setChecked(true);
             }
 

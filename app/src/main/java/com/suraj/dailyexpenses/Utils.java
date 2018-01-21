@@ -329,7 +329,7 @@ public class Utils {
         ArrayList<BasicItem> results = new ArrayList<>();
 
         for (BasicItem basicItem : realmQuery.findAll()) {
-            if (monthlyViewStateHolder != null && monthlyViewStateHolder.isElementIncluded(basicItem.getTag()) == monthlyViewStateHolder.isInvertMode())
+            if (monthlyViewStateHolder != null && !monthlyViewStateHolder.isElementAllowed(basicItem.getTag()))
                 continue;
 
             results.add(basicItem);
@@ -350,7 +350,7 @@ public class Utils {
         ArrayList<BasicItem> results = getItemsForDate(date, monthlyViewStateHolder);
 
         for (BasicItem basicItem : results) {
-            if (monthlyViewStateHolder != null && monthlyViewStateHolder.isElementIncluded(basicItem.getTag()) == monthlyViewStateHolder.isInvertMode())
+            if (monthlyViewStateHolder != null && !monthlyViewStateHolder.isElementAllowed(basicItem.getTag()))
                 continue;
 
             sum += basicItem.getAmount();
@@ -444,7 +444,7 @@ public class Utils {
 
         int sum = 0;
         for (BasicItem basicItem : realmResults) {
-            if (monthlyViewStateHolder != null && monthlyViewStateHolder.isElementIncluded(basicItem.getTag()) == monthlyViewStateHolder.isInvertMode())
+            if (monthlyViewStateHolder != null && !monthlyViewStateHolder.isElementAllowed(basicItem.getTag()))
                 continue;
 
             sum += basicItem.getAmount();
@@ -487,7 +487,7 @@ public class Utils {
         for (BasicItem basicItem : realmResults) {
             String date = basicItem.getDate();
 
-            if (basicItem.getMonth() != month || basicItem.getYear() != year || monthlyViewStateHolder != null && monthlyViewStateHolder.isElementIncluded(basicItem.getTag()) == monthlyViewStateHolder.isInvertMode())
+            if (basicItem.getMonth() != month || basicItem.getYear() != year || monthlyViewStateHolder != null && !monthlyViewStateHolder.isElementAllowed(basicItem.getTag()))
                 continue;
 
             Integer current = monthExpensesTreeMap.get(date);
@@ -817,7 +817,7 @@ public class Utils {
             }
 
             realm.commitTransaction();
-            Utils.getEditor().putStringSet(Utils.SETTINGS_DEFAULT_TAG_FILTER, new HashSet<>(Utils.getAllTags()));
+            Utils.getEditor().putStringSet(Utils.SETTINGS_DEFAULT_TAG_FILTER, new HashSet<String>());
             Utils.getEditor().putBoolean(Utils.SETTINGS_DEFAULT_TAG_FILTER_MODE, false);
             Utils.getEditor().apply();
             Utils.showToast(context.getString(R.string.restoreCompleteNotify));

@@ -107,25 +107,25 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
             if (i == -1) {
                 monthList.add(monthName);
                 spinMonth.setAdapter(new ArrayAdapter<>(MonthExpensesActivity.this, android.R.layout.simple_spinner_dropdown_item, monthList));
-                spinMonth.setSelection(monthList.size()-1);
-            }else{
+                spinMonth.setSelection(monthList.size() - 1);
+            } else {
                 spinMonth.setSelection(i);
             }
 
-            i = yearList.indexOf(""+year);
+            i = yearList.indexOf("" + year);
 
             if (i == -1) {
                 yearList.add(monthName);
                 spinYear.setAdapter(new ArrayAdapter<>(MonthExpensesActivity.this, android.R.layout.simple_spinner_dropdown_item, yearList));
-                spinYear.setSelection(yearList.size()-1);
-            }else{
+                spinYear.setSelection(yearList.size() - 1);
+            } else {
                 spinYear.setSelection(i);
             }
 
         } else if (monthList.size() == 0) {
             Calendar c = Calendar.getInstance();
             monthList.add(Utils.getMonthNameFromNumber(c.get(Calendar.MONTH) + 1));
-            yearList.add(""+year);
+            yearList.add("" + year);
             spinMonth.setAdapter(new ArrayAdapter<>(MonthExpensesActivity.this, android.R.layout.simple_spinner_dropdown_item, monthList));
             spinYear.setAdapter(new ArrayAdapter<>(MonthExpensesActivity.this, android.R.layout.simple_spinner_dropdown_item, yearList));
         }
@@ -335,11 +335,11 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
             public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
                 final TextView tv = (TextView) view.findViewById(R.id.tvTagName);
 
-                if (monthlyViewStateHolder.isElementIncluded(tags.get(i))) {
-                    tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                if (monthlyViewStateHolder.isElementIncludedInList(tags.get(i))) {
+                    tv.setPaintFlags(tv.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
                     monthlyViewStateHolder.removeElement(tags.get(i));
                 } else {
-                    tv.setPaintFlags(tv.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+                    tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                     monthlyViewStateHolder.addElement(tags.get(i));
                 }
 
@@ -351,6 +351,7 @@ public class MonthExpensesActivity extends AppCompatActivity implements Inflatio
             public void onClick(View view) {
                 Switch aSwitch = (Switch) view;
 
+                //monthlyViewStateHolder.invertList();
                 monthlyViewStateHolder.setInvertMode(!monthlyViewStateHolder.isInvertMode());
 
                 if (monthlyViewStateHolder.isInvertMode()) {
