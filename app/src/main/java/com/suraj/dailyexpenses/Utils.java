@@ -72,7 +72,7 @@ public class Utils {
     public static final String DEFAULT_TAG_NAME = "Daily";
     public static final String SETTINGS_DEFAULT_TAG_FILTER = "default_tag_filter";
     public static final String SETTINGS_DEFAULT_TAG_FILTER_MODE = "default_tag_filter_mode";
-    public static final String SETTINGS_DEFAULT_TAG_FILTER_STATS = "default_tag_filter_mode_stats";
+    public static final String SETTINGS_DEFAULT_TAG_FILTER_STATS = "default_tag_filter_stats";
     public static final String SETTINGS_DEFAULT_TAG_FILTER_MODE_STATS = "default_tag_filter_mode_stats";
 
     public static Comparator<Object> dateComparator;

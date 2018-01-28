@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
 
 import uk.co.deanwild.materialshowcaseview.IShowcaseListener;
@@ -36,7 +37,6 @@ import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
 public class ViewExpensesActivity extends AppCompatActivity implements InflationManager {
-
     private int dayOfWeek;
     private int day;
     private int month;
@@ -57,6 +57,7 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
 
     private static ViewExpensesActivity viewExpensesActivity;
     private MonthlyViewStateHolder monthlyViewStateHolder;
+    private TagsFilterView tagsFilterView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,39 +74,19 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
 
         tags = Utils.getAllTags();
 
-        if (tags.size() == 0) {
-            tags.add(getString(R.string.daily_tag));
-            monthlyViewStateHolder = new MonthlyViewStateHolder();
-            monthlyViewStateHolder.addElement(getString(R.string.daily_tag));
-        }
+        monthlyViewStateHolder = new MonthlyViewStateHolder();
+        loadSettings();
+
+        tagsFilterView = new TagsFilterView(this, tags, monthlyViewStateHolder);
 
         Calendar calendar = Calendar.getInstance();
 
-        if (getIntent().getStringExtra(Utils.DATE_INTENT_STRING) == null) {
-            day = calendar.get(Calendar.DAY_OF_MONTH);
-            month = calendar.get(Calendar.MONTH) + 1;
-            year = calendar.get(Calendar.YEAR);
-            monthlyViewStateHolder = new MonthlyViewStateHolder();
-        } else {
-            date = getIntent().getStringExtra(Utils.DATE_INTENT_STRING);
-            monthlyViewStateHolder = (MonthlyViewStateHolder) getIntent().getSerializableExtra(Utils.MONTHLY_STATE_HOLDER_INTENT_STRING);
+        day = getIntent().getIntExtra(Utils.DATE_INTENT_STRING, 8);
+        month = getIntent().getIntExtra(Utils.MONTH_NUMBER_INTENT_STRING,2);
+        year = getIntent().getIntExtra(Utils.YEAR_INTENT_STRING, 1996);
 
-            //null when coming from MainActivity
-            if (monthlyViewStateHolder == null) {
-                monthlyViewStateHolder = new MonthlyViewStateHolder();
-                monthlyViewStateHolder.addAllElements(tags);
-            }
-
-            String[] splits = date.split("/");
-
-            day = Integer.parseInt(splits[0].split(" ")[1]);
-            month = Integer.parseInt(splits[1]);
-            year = Integer.parseInt(splits[2]);
-
-            calendar.set(year, month - 1, day);
-
-            dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-        }
+        calendar.set(year, month -1, day);
+        dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
 
         setDateString();
 
@@ -158,6 +139,11 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
         showTipsForButtons();
         Utils.requestSelfPermission(this);
 
+    }
+
+    private void loadSettings() {
+        monthlyViewStateHolder.addAllElements(Utils.getSharedPreferences().getStringSet(Utils.SETTINGS_DEFAULT_TAG_FILTER, new HashSet<String>()));
+        monthlyViewStateHolder.setInvertMode(Utils.getSharedPreferences().getBoolean(Utils.SETTINGS_DEFAULT_TAG_FILTER_MODE, false));
     }
 
     @Override
@@ -296,7 +282,7 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
                 break;
             case R.id.action_exportSpecific:
 
-                Utils.getInputDialogBuilder(this,(date + ".csv").replaceAll("/", "-"))
+                Utils.getInputDialogBuilder(this, (date + ".csv").replaceAll("/", "-"))
                         .setTitle(getResources().getString(R.string.enterFileName))
                         .setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
                             @Override
@@ -385,8 +371,6 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
 
 
     private void showTagsDialog() {
-        final TagsFilterView tagsFilterView = new TagsFilterView(this, tags, monthlyViewStateHolder);
-
         tagsFilterView.setDismissListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -414,14 +398,14 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
         tagsFilterView.setSwitchClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Switch aSwitch = (Switch)view;
+                Switch aSwitch = (Switch) view;
 
                 //monthlyViewStateHolder.invertList();
                 monthlyViewStateHolder.setInvertMode(!monthlyViewStateHolder.isInvertMode());
 
-                if(monthlyViewStateHolder.isInvertMode()){
+                if (monthlyViewStateHolder.isInvertMode()) {
                     aSwitch.setText(getString(R.string.include_these));
-                }else{
+                } else {
                     aSwitch.setText(getString(R.string.exclude_these));
                 }
 

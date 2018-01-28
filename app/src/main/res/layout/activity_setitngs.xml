@@ -47,7 +47,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/setting_tv_default_filter"
         android:layout_marginTop="@dimen/setting_lable_seperator"
-        android:text="@string/settings_default_filter_label" />
+        android:text="@string/settings_default_filter_stats_label" />
 
     <Button
         android:id="@+id/setting_btn_default_filter_stats"

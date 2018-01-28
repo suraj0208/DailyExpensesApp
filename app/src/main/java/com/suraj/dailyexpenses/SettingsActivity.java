@@ -22,8 +22,8 @@ public class SettingsActivity extends AppCompatActivity {
     private EditText etDefaultTag;
     private Button btnDefaultTagFilter;
     private Button btnDefaultTagFilterStats;
-    private boolean defaultTagFilterMode;
     private MonthlyViewStateHolder monthlyViewStateHolder;
+    private MonthlyViewStateHolder monthlyViewStateHolderStats;
     private TagSelectorView tagSelectorView;
     private TagsFilterView tagsFilterView;
 
@@ -42,7 +42,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     }
 
-    public void setTagListeners(){
+    public void setTagListeners(final MonthlyViewStateHolder monthlyViewStateHolder){
         final List<String> tags = Utils.getAllTags();
         tagsFilterView = new TagsFilterView(this, tags, monthlyViewStateHolder);
 
@@ -81,8 +81,6 @@ public class SettingsActivity extends AppCompatActivity {
                 } else {
                     aSwitch.setText(getString(R.string.exclude_these));
                 }
-
-                defaultTagFilterMode = monthlyViewStateHolder.isInvertMode();
             }
         });
     }
@@ -91,7 +89,7 @@ public class SettingsActivity extends AppCompatActivity {
         btnDefaultTagFilter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setTagListeners();
+                setTagListeners(monthlyViewStateHolder);
                 tagsFilterView.show();
             }
         });
@@ -99,17 +97,11 @@ public class SettingsActivity extends AppCompatActivity {
         btnDefaultTagFilterStats.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setTagListeners();
+                setTagListeners(monthlyViewStateHolderStats);
                 tagsFilterView.show();
             }
         });
 
-        btnDefaultTagFilterStats.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                tagSelectorView.show();
-            }
-        });
 
         class BooleanHolder {
             boolean bool;
@@ -142,13 +134,13 @@ public class SettingsActivity extends AppCompatActivity {
         etDefaultTag.setText(Utils.getStringFromSharedPreferences(Utils.SETTINGS_DEFAULT_TAG));
 
         monthlyViewStateHolder = new MonthlyViewStateHolder();
+        monthlyViewStateHolderStats = new MonthlyViewStateHolder();
 
-        //order is important here
         monthlyViewStateHolder.addAllElements(Utils.getSharedPreferences().getStringSet(Utils.SETTINGS_DEFAULT_TAG_FILTER, new HashSet<String>()));
         monthlyViewStateHolder.setInvertMode(Utils.getSharedPreferences().getBoolean(Utils.SETTINGS_DEFAULT_TAG_FILTER_MODE, false));
 
-        System.out.println("cs: " + monthlyViewStateHolder.getCurrentTags().size());
-        System.out.println("ct: " + monthlyViewStateHolder.isInvertMode());
+        monthlyViewStateHolderStats.addAllElements(Utils.getSharedPreferences().getStringSet(Utils.SETTINGS_DEFAULT_TAG_FILTER_STATS, new HashSet<String>()));
+        monthlyViewStateHolderStats.setInvertMode(Utils.getSharedPreferences().getBoolean(Utils.SETTINGS_DEFAULT_TAG_FILTER_MODE_STATS, false));
 
     }
 
@@ -171,10 +163,10 @@ public class SettingsActivity extends AppCompatActivity {
         Utils.putStringInSharedPreferences(Utils.SETTINGS_DEFAULT_TAG, etDefaultTag.getText().toString());
 
         Utils.getEditor().putStringSet(Utils.SETTINGS_DEFAULT_TAG_FILTER, monthlyViewStateHolder.getCurrentTags());
-        Utils.getEditor().putBoolean(Utils.SETTINGS_DEFAULT_TAG_FILTER_MODE, defaultTagFilterMode);
+        Utils.getEditor().putBoolean(Utils.SETTINGS_DEFAULT_TAG_FILTER_MODE, monthlyViewStateHolder.isInvertMode());
 
-        System.out.println("s: " + monthlyViewStateHolder.getCurrentTags().size());
-        System.out.println("t: " + monthlyViewStateHolder.isInvertMode());
+        Utils.getEditor().putStringSet(Utils.SETTINGS_DEFAULT_TAG_FILTER_STATS, monthlyViewStateHolderStats.getCurrentTags());
+        Utils.getEditor().putBoolean(Utils.SETTINGS_DEFAULT_TAG_FILTER_MODE_STATS, monthlyViewStateHolderStats.isInvertMode());
 
         Utils.getEditor().apply();
     }

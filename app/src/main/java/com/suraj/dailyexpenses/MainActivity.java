@@ -95,12 +95,12 @@ public class MainActivity extends AppCompatActivity {
         Calendar calendar = Calendar.getInstance();
 
         year = calendar.get(Calendar.YEAR);
-        month = calendar.get(Calendar.MONTH);
+        month = calendar.get(Calendar.MONTH) + 1;
         day = calendar.get(Calendar.DAY_OF_MONTH);
 
         initPickerViews(day, month);
 
-        showDateOnTextView(calendar.get(Calendar.DAY_OF_WEEK), year, month + 1, day);
+        showDateOnTextView(calendar.get(Calendar.DAY_OF_WEEK), year, month, day);
 
         showTodayExpenditure();
         setupTips();
@@ -196,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initPickerViews(int day, int month) {
         tvPickDate.setText("" + day);
-        btnSetDate.setText(Utils.getMonthNameFromNumber(month + 1));
+        btnSetDate.setText(Utils.getMonthNameFromNumber(month));
     }
 
     private void ensureSingleInstanceOnActivityStack() {
@@ -258,7 +258,11 @@ public class MainActivity extends AppCompatActivity {
         (findViewById(R.id.btnViewDay)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, ViewExpensesActivity.class).putExtra(Utils.DATE_INTENT_STRING, tvDate.getText().toString()));
+                Intent intent = new Intent(MainActivity.this, ViewExpensesActivity.class).putExtra(Utils.DATE_INTENT_STRING, tvDate.getText().toString());
+                intent.putExtra(Utils.DATE_INTENT_STRING, day);
+                intent.putExtra(Utils.MONTH_NUMBER_INTENT_STRING, month);
+                intent.putExtra(Utils.YEAR_INTENT_STRING, year);
+                startActivity(intent);
             }
         });
 
@@ -266,7 +270,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, MonthExpensesActivity.class);
-                intent.putExtra(Utils.MONTH_NUMBER_INTENT_STRING, month + 1);
+                intent.putExtra(Utils.MONTH_NUMBER_INTENT_STRING, month);
                 intent.putExtra(Utils.YEAR_INTENT_STRING, year);
                 startActivity(intent);
             }
@@ -276,7 +280,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, BrowseTagsActivity.class);
-                intent.putExtra(Utils.MONTH_NUMBER_INTENT_STRING, month + 1);
+                intent.putExtra(Utils.MONTH_NUMBER_INTENT_STRING, month);
                 intent.putExtra(Utils.YEAR_INTENT_STRING, year);
                 startActivity(intent);
             }
@@ -462,9 +466,13 @@ public class MainActivity extends AppCompatActivity {
                     Calendar calendar = Calendar.getInstance();
                     calendar.set(year, month, day);
                     int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-                    initPickerViews(day, month);
-                    showDateOnTextView(dayOfWeek, year, month + 1, day);
+                    MainActivity.this.day = day;
+                    MainActivity.this.month = month + 1;
+                    MainActivity.this.year = year;
+                    initPickerViews(MainActivity.this.day, MainActivity.this.month);
+                    showDateOnTextView(dayOfWeek, MainActivity.this.year, MainActivity.this.month, MainActivity.this.day);
                     showTodayExpenditure();
+
                 }
             };
 
@@ -478,7 +486,7 @@ public class MainActivity extends AppCompatActivity {
     protected Dialog onCreateDialog(int id) {
         if (id == 999) {
             return new DatePickerDialog(this,
-                    myDateListener, year, month, day);
+                    myDateListener, year, month-1, day);
         }
         return null;
     }
@@ -587,7 +595,7 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.action_stats:
                 Intent intent = new Intent(MainActivity.this, StatsActivity.class);
-                intent.putExtra(Utils.MONTH_NUMBER_INTENT_STRING, month + 1);
+                intent.putExtra(Utils.MONTH_NUMBER_INTENT_STRING, month);
                 intent.putExtra(Utils.YEAR_INTENT_STRING, year);
                 startActivity(intent);
                 break;

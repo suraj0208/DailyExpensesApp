@@ -16,6 +16,7 @@ import com.suraj.dailyexpenses.widgets.TagsFilterView;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 public class StatsActivity extends AppCompatActivity {
@@ -40,7 +41,8 @@ public class StatsActivity extends AppCompatActivity {
 
         monthlyViewStateHolder = new MonthlyViewStateHolder();
         tags = Utils.getAllTags();
-        monthlyViewStateHolder.addAllElements(tags);
+
+        loadCurrentSettings();
 
         initViews();
 
@@ -62,6 +64,11 @@ public class StatsActivity extends AppCompatActivity {
         //To Do: Handle month list empty condition here
         displayStatsForMonth();
 
+    }
+
+    private void loadCurrentSettings() {
+        monthlyViewStateHolder.addAllElements(Utils.getSharedPreferences().getStringSet(Utils.SETTINGS_DEFAULT_TAG_FILTER_STATS, new HashSet<String>()));
+        monthlyViewStateHolder.setInvertMode(Utils.getSharedPreferences().getBoolean(Utils.SETTINGS_DEFAULT_TAG_FILTER_MODE_STATS, false));
     }
 
     private void initSpinners() {
@@ -215,7 +222,7 @@ public class StatsActivity extends AppCompatActivity {
         BasicItem basicItemMax = new BasicItem();
 
         for (BasicItem basicItem : basicItems) {
-            if (monthlyViewStateHolder.isElementAllowed(basicItem.getTag()))
+            if (!monthlyViewStateHolder.isElementAllowed(basicItem.getTag()))
                 continue;
 
             int prev = max;
