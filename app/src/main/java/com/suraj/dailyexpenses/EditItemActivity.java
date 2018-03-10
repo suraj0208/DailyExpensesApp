@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -40,11 +39,11 @@ public class EditItemActivity extends AppCompatActivity {
 
         basicItem = Utils.getBasicItemFromDataBase(getIntent().getLongExtra(Utils.TIMESTAMP_INTENT_STRING, -1));
 
-        (etEditItemReason = (EditText) findViewById(R.id.etEditItemReason)).setText(basicItem.getReason());
-        (etEditItemAmount = (EditText) findViewById(R.id.etEditItemAmount)).setText(Integer.toString(basicItem.getAmount()));
-        (etEditTag = (EditText) findViewById(R.id.etEditTag)).setText(basicItem.getTag());
+        (etEditItemReason = (EditText) findViewById(R.id.activity_edit_item_et_reason)).setText(basicItem.getReason());
+        (etEditItemAmount = (EditText) findViewById(R.id.activity_edit_item_et_item_amount)).setText(Integer.toString(basicItem.getAmount()));
+        (etEditTag = (EditText) findViewById(R.id.activity_edit_item_item_tag)).setText(basicItem.getTag());
 
-        (findViewById(R.id.btnEditDelete)).setOnClickListener(new View.OnClickListener() {
+        (findViewById(R.id.activity_edit_item_btn_delete_item)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 new AlertDialog.Builder(EditItemActivity.this)

@@ -42,17 +42,17 @@ public class BrowseTagsActivity extends AppCompatActivity implements InflationMa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_browse_tags);
 
-        lstViewBrowseTags = (ListView) findViewById(R.id.lstViewBrowseTags);
+        lstViewBrowseTags = (ListView) findViewById(R.id.activity_browse_tags_list_view_tags_details);
 
-        spinMonth = (Spinner) findViewById(R.id.spinMonths);
-        spinYear = (Spinner) findViewById(R.id.spinYear);
+        spinMonth = (Spinner) findViewById(R.id.activity_browse_tags_spin_months);
+        spinYear = (Spinner) findViewById(R.id.activity_browse_tags_spin_year);
 
         tagsComparator = new Utils.TagsComparator();
         tagsComparator.setType(1);
 
-        tvExpenditureForMonth = (TextView) findViewById(R.id.tvExpenditureForMonth);
+        tvExpenditureForMonth = (TextView) findViewById(R.id.activity_browse_tags_tv_expenditure_month);
 
-        btnMonthlyDetailsMonthName = (Button) findViewById(R.id.btnMonthlyDetailsMonthName);
+        btnMonthlyDetailsMonthName = (Button) findViewById(R.id.activity_browse_tags_btn_monthly_details_month_name);
 
         monthNumber = getIntent().getIntExtra(Utils.MONTH_NUMBER_INTENT_STRING, -1);
         year = getIntent().getIntExtra(Utils.YEAR_INTENT_STRING, -1);

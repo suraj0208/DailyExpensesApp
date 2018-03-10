@@ -74,8 +74,14 @@ public class ViewExpensesActivity extends AppCompatActivity implements Inflation
 
         tags = Utils.getAllTags();
 
-        monthlyViewStateHolder = new MonthlyViewStateHolder();
-        loadSettings();
+        Object holder = getIntent().getSerializableExtra(Utils.MONTHLY_STATE_HOLDER_INTENT_STRING);
+
+        if(holder == null){
+            monthlyViewStateHolder = new MonthlyViewStateHolder();
+            loadSettings();
+        }else{
+            monthlyViewStateHolder = (MonthlyViewStateHolder) holder;
+        }
 
         tagsFilterView = new TagsFilterView(this, tags, monthlyViewStateHolder);
 

@@ -7,7 +7,7 @@
     tools:context="com.suraj.dailyexpenses.MainActivity">
 
     <TextView
-        android:id="@+id/tvDate"
+        android:id="@+id/activity_main_tv_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -18,10 +18,10 @@
         android:text="@string/setDate" />
 
     <FrameLayout
-        android:id="@+id/frameLayoutCurrentDate"
+        android:id="@+id/activity_main_frame_layout_current_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/tvDate"
+        android:layout_alignBottom="@+id/activity_main_tv_date"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_marginBottom="10dp"
@@ -29,7 +29,7 @@
         android:layout_marginRight="@dimen/activity_horizontal_margin">
 
         <android.support.v7.widget.AppCompatButton
-            android:id="@+id/btnSetDate"
+            android:id="@+id/activity_main_btn_set_date"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="@drawable/ic_pick_date"
@@ -40,7 +40,7 @@
             android:textSize="@dimen/picker_icon_text_size" />
 
         <TextView
-            android:id="@+id/tvPickDate"
+            android:id="@+id/activity_main_tv_pick_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -52,36 +52,36 @@
 
 
     <EditText
-        android:id="@+id/etTag"
+        android:id="@+id/activity_main_et_tag"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@id/tvDate"
+        android:layout_below="@id/activity_main_tv_date"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_marginTop="5dp"
         android:hint="@string/tag_hint"/>
 
     <EditText
-        android:id="@+id/etSpendReason"
+        android:id="@+id/activity_main_et_reason"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tvDate"
+        android:layout_below="@id/activity_main_tv_date"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginTop="5dp"
-        android:layout_toLeftOf="@id/etTag"
-        android:layout_toStartOf="@id/etTag"
+        android:layout_toLeftOf="@id/activity_main_et_tag"
+        android:layout_toStartOf="@id/activity_main_et_tag"
         android:hint="@string/spentReasonHint" />
 
     <HorizontalScrollView
         android:id="@+id/hzScrollViewReasons"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/etSpendReason"
+        android:layout_below="@id/activity_main_et_reason"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         android:scrollbarSize="0dp">

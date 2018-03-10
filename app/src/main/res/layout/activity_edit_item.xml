@@ -11,36 +11,36 @@
 
 
     <EditText
-        android:id="@+id/etEditItemReason"
+        android:id="@+id/activity_edit_item_et_reason"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/spentReasonHint" />
 
     <EditText
-        android:id="@+id/etEditItemAmount"
+        android:id="@+id/activity_edit_item_et_item_amount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/etEditItemReason"
+        android:layout_below="@id/activity_edit_item_et_reason"
         android:hint="@string/spentReasonAmountHint"
         android:inputType="number" />
 
     <EditText
-        android:id="@+id/etEditTag"
+        android:id="@+id/activity_edit_item_item_tag"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/etEditItemAmount"
+        android:layout_below="@id/activity_edit_item_et_item_amount"
         android:layout_marginTop="10dp"
         android:hint="@string/tag_hint" />
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/etEditTag"
+        android:layout_below="@id/activity_edit_item_item_tag"
         android:layout_marginTop="10dp"
         android:background="@color/colorAccent">
 
         <Button
-            android:id="@+id/btnEditDelete"
+            android:id="@+id/activity_edit_item_btn_delete_item"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?android:attr/selectableItemBackground"
@@ -48,6 +48,5 @@
             android:textColor="@android:color/white" />
 
     </FrameLayout>
-
 
 </RelativeLayout>

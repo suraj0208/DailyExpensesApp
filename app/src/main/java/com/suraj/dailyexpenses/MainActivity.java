@@ -66,15 +66,15 @@ public class MainActivity extends AppCompatActivity {
 
         commonReasons = new HashSet<>();
 
-        tvDate = (TextView) findViewById(R.id.tvDate);
+        tvDate = (TextView) findViewById(R.id.activity_main_tv_date);
         tvTodayExpenditure = (TextView) findViewById(R.id.tvTodaysExpenditure);
-        tvPickDate = (TextView) findViewById(R.id.tvPickDate);
+        tvPickDate = (TextView) findViewById(R.id.activity_main_tv_pick_date);
 
-        etSpendReason = (EditText) findViewById(R.id.etSpendReason);
+        etSpendReason = (EditText) findViewById(R.id.activity_main_et_reason);
         etSpendReason.requestFocus();
         etSpentAmount = (EditText) findViewById(R.id.etSpentAmount);
 
-        etTag = (EditText) findViewById(R.id.etTag);
+        etTag = (EditText) findViewById(R.id.activity_main_et_tag);
         etTag.setText(Utils.DEFAULT_TAG_NAME);
 
         initReasonViews();
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         initViewButtons();
         loadSettings();
 
-        btnSetDate = (Button) findViewById(R.id.btnSetDate);
+        btnSetDate = (Button) findViewById(R.id.activity_main_btn_set_date);
         btnSetDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -108,20 +108,7 @@ public class MainActivity extends AppCompatActivity {
         ensureSingleInstanceOnActivityStack();
         loadFromNotification();
 
-//        HashMap<String,Integer> stringIntegerHashMap = Utils.getTopItemsForMonth(4);
-//
-//        int total = Utils.getExpensesForMonth(4);
-//        System.out.println("total " + total);
-//
-//        int i=0;
-//
-//        for(String k:stringIntegerHashMap.keySet()){
-//            System.out.println(k+ " " +stringIntegerHashMap.get(k));
-//            PieChartActivity.angles[i] = ((double)(stringIntegerHashMap.get(k)*360))/total;
-//            i++;
-//        }
-//        startActivity(new Intent(MainActivity.this, PieChartActivity.class));
-
+        Utils.requestSelfPermission(MainActivity.this);
     }
 
     private void loadSettings() {
@@ -208,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupTips() {
 
-        MaterialShowcaseView materialShowcaseViewDate = buildCircularMaterialShowcaseView(findViewById(R.id.btnSetDate), getString(R.string.tipOk), getString(R.string.tipSetDate));
+        MaterialShowcaseView materialShowcaseViewDate = buildCircularMaterialShowcaseView(findViewById(R.id.activity_main_btn_set_date), getString(R.string.tipOk), getString(R.string.tipSetDate));
 
         MaterialShowcaseView materialShowcaseViewCommonItems = buildRectangularMaterialShowcaseView(findViewById(R.id.hzScrollViewReasons), getString(R.string.tipGotIt), getString(R.string.tipCommonItems), true);
 
@@ -420,8 +407,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParams.addRule(RelativeLayout.BELOW, R.id.tvDate);
-        layoutParams.addRule(RelativeLayout.LEFT_OF, R.id.etTag);
+        layoutParams.addRule(RelativeLayout.BELOW, R.id.activity_main_tv_date);
+        layoutParams.addRule(RelativeLayout.LEFT_OF, R.id.activity_main_et_tag);
 
         layoutParams.setMargins(((RelativeLayout.LayoutParams) etSpendReason.getLayoutParams()).leftMargin, ((RelativeLayout.LayoutParams) etSpendReason.getLayoutParams()).topMargin, ((RelativeLayout.LayoutParams) etSpendReason.getLayoutParams()).rightMargin, 0);
 
@@ -486,7 +473,7 @@ public class MainActivity extends AppCompatActivity {
     protected Dialog onCreateDialog(int id) {
         if (id == 999) {
             return new DatePickerDialog(this,
-                    myDateListener, year, month-1, day);
+                    myDateListener, year, month - 1, day);
         }
         return null;
     }
@@ -584,13 +571,39 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_backup:
-                Utils.requestSelfPermission(MainActivity.this);
-                Utils.backup();
+                new AlertDialog.Builder(this).setTitle("Confirm")
+                        .setMessage("This will overwrite the latest backup. Do you want to continue?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Utils.backup();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        })
+                        .show();
                 return true;
 
             case R.id.action_restore:
-                Utils.requestSelfPermission(MainActivity.this);
-                Utils.restore(true);
+                new AlertDialog.Builder(this).setTitle("Confirm")
+                        .setMessage("This will erase the current data. Do you want to continue?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Utils.restore(true);
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        })
+                        .show();
                 return true;
 
             case R.id.action_stats:
